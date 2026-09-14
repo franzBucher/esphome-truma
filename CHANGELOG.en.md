@@ -12,17 +12,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release only touches the example configurations: the "Operating Status" sensor now
-has an `id` and can be evaluated from lambdas, for example to tell whether the burner is
-currently running. No changes to the component code.
+This release adds two new `text_sensor` types (`TIMER_START_TIME` / `TIMER_STOP_TIME`) that expose
+the timer start/stop times the CP Plus already reports over the LIN bus as their own Home Assistant
+entities. Existing `text_sensor` configs without `type:` are unaffected (default stays `VERSION`).
 
-Tested against:
+⚠️ This change has not been tested on real hardware yet (neither compiled nor verified against a
+CP Plus) — please double-check with `esphome compile`/`esphome run` yourself before relying on it.
+
+Last tested on hardware (as of 1.0.25):
 - ESPHome **2026.8.2** — ESP-IDF ✅
 - ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.26] — 2026-09-14 — Timer start/stop time as a text sensor
+
+### Added
+- New `text_sensor` types `TIMER_START_TIME` and `TIMER_STOP_TIME`: report the timer start/stop
+  time currently stored on the CP Plus, formatted as `HH:MM`
+- Both read the same `StatusFrameTimer` LIN bus message that already feeds the `TIMER_ACTIVE` /
+  `TIMER_ROOM` / `TIMER_WATER` binary sensors — no extra bus traffic
+- The `text_sensor` platform now supports multiple types via `type:` (previously only the version
+  display was possible). `type:` is optional, defaulting to `VERSION` — existing configs without
+  `type:` are unaffected
+- README (DE/EN): new section documenting the available `text_sensor` types with an example YAML
+
+### Internal
+- `TrumaVersionTextSensor` now also inherits from `Parented<TrumaiNetBoxApp>` so that every
+  `truma_inetbox` text sensor can be registered through the same generic `to_code()` path (unused
+  parent pointer, no behavior change)
 
 ## [1.0.25] — 2026-09-07 — Example YAMLs: `id` for Operating Status
 

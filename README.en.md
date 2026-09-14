@@ -483,15 +483,36 @@ What distinguishes the values from 5 upwards has not been decoded so far.
 
 ### Text Sensor
 
-Exposes the installed component version in the ESPHome web interface and Home Assistant.
-
 ```yaml
 text_sensor:
   - platform: truma_inetbox
     name: "ESPHome Truma Version"
+    type: VERSION
+  - platform: truma_inetbox
+    name: "Timer Start"
+    type: TIMER_START_TIME
+  - platform: truma_inetbox
+    name: "Timer Stop"
+    type: TIMER_STOP_TIME
 ```
 
 Defaults: `entity_category: diagnostic`, `icon: mdi:tag`. No further parameters required.
+`type:` is optional and defaults to `VERSION` when omitted, so existing configs without a `type:`
+keep working unchanged.
+
+Available `type` values:
+
+- `VERSION` — exposes the installed component version in the ESPHome web interface and Home Assistant.
+- `TIMER_START_TIME` — start time of the timer schedule currently stored on the CP Plus, formatted as
+  `HH:MM` (e.g. `07:00`).
+- `TIMER_STOP_TIME` — stop time of the timer schedule currently stored on the CP Plus, formatted as
+  `HH:MM`.
+
+`TIMER_START_TIME` and `TIMER_STOP_TIME` read the same `StatusFrameTimer` message the CP Plus already
+sends over the LIN bus as part of its normal update cycle (the same message that also feeds the
+`TIMER_ACTIVE` / `TIMER_ROOM` / `TIMER_WATER` binary sensors) — nothing extra is requested from the
+device, an already-arriving field is simply exposed as its own entity as well. Both sensors therefore
+refresh on the same cadence as, for example, `CURRENT_ROOM_TEMPERATURE`.
 
 ### Actions
 

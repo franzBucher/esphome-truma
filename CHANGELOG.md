@@ -12,17 +12,39 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release ändert nur die Beispielkonfigurationen: Der Sensor „Operating Status" hat
-jetzt eine `id` und lässt sich damit in Lambdas auswerten, etwa um zu erkennen, ob der
-Brenner gerade läuft. Am Code der Komponenten hat sich nichts geändert.
+Dieses Release fügt zwei neue `text_sensor`-Typen hinzu (`TIMER_START_TIME` / `TIMER_STOP_TIME`),
+die die vom CP Plus bereits über den LIN-Bus gelieferten Timer-Start-/Stoppzeiten als eigene
+Home-Assistant-Entität verfügbar machen. Bestehende `text_sensor`-Configs ohne `type:` sind davon
+nicht betroffen (Default bleibt `VERSION`).
 
-Getestet mit:
+⚠️ Diese Änderung wurde noch nicht auf echter Hardware getestet (weder kompiliert noch gegen ein
+CP Plus verifiziert) — vor dem produktiven Einsatz bitte selbst mit `esphome compile`/`esphome run`
+gegenprüfen.
+
+Zuletzt auf Hardware getestet (Stand 1.0.25):
 - ESPHome **2026.8.2** — ESP-IDF ✅
 - ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.26] — 2026-09-14 — Timer-Start-/Stoppzeit als Text Sensor
+
+### Hinzugefügt
+- Neue `text_sensor`-Typen `TIMER_START_TIME` und `TIMER_STOP_TIME`: geben die aktuell auf dem
+  CP Plus hinterlegte Timer-Start- bzw. Stoppzeit im Format `HH:MM` aus
+- Beide lesen dieselbe `StatusFrameTimer`-LIN-Bus-Nachricht, die auch die Binary Sensors
+  `TIMER_ACTIVE` / `TIMER_ROOM` / `TIMER_WATER` speist — kein zusätzlicher Bus-Traffic
+- `text_sensor`-Plattform unterstützt jetzt mehrere Typen über `type:` (vorher war nur die
+  Versionsanzeige möglich). `type:` ist optional, Default `VERSION` — bestehende Configs ohne
+  `type:` sind nicht betroffen
+- README (DE/EN): neuer Abschnitt zu den verfügbaren `text_sensor`-Typen mit Beispiel-YAML
+
+### Intern
+- `TrumaVersionTextSensor` erbt jetzt zusätzlich von `Parented<TrumaiNetBoxApp>`, damit alle
+  `truma_inetbox`-Text-Sensoren über denselben generischen `to_code()`-Pfad registriert werden
+  können (ungenutzter Parent-Pointer, kein Verhaltensunterschied)
 
 ## [1.0.25] — 2026-09-07 — Beispiel-YAMLs: `id` für Operating Status
 
