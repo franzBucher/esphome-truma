@@ -22,30 +22,35 @@ Tested against:
 ---
 
 
+## [1.0.43] — 2026-10-14 — Heating with a target, clock sync
+
+### Fixed
+- `truma_inetbox`: Heating with a temperature in one call (e.g. `climate.set_temperature` with
+  `hvac_mode: heat`) now sets the requested temperature instead of 5 °C (water 40 °C). Confirmed on the bench.
+- `truma_inetbox`: The clock is set again if HA was not connected at the first attempt. Confirmed on
+  the bench.
+
 ## [1.0.42] — 2026-10-14 — CP Plus C3
 
 ### Fixed
-- `truma_inetbox`: On a CP Plus C3, registration, init and commands from HA only went through while the
-  panel was awake, now also in standby. The clock is not set on a C3, it does not accept it. Tested by
-  Marco on a CP Plus C3.00.00 with Combi 6 Gas (issue #29), no regression on a CP Plus 4.04.01. Thanks
-  to [Marco (@magior)](https://github.com/magior) for the contribution (PR #30).
+- `truma_inetbox`: CP Plus C3: init and commands from HA also go through while the panel sleeps, the
+  clock is not set there. Confirmed by Marco (issue #29), thanks to
+  [Marco (@magior)](https://github.com/magior) for PR #30.
 
 ### Changed
-- `truma_inetbox`: `HEATER_HAS_ERROR` now turns on for every error or warning of the heater, also for
-  W255 (heater does not answer), which also shows briefly when the CP Plus starts. Before, the sensor
-  practically never turned on.
-- `truma_inetbox`: The fan mode select sends Eco/High to a Combi that reports like a Vario Heat (e.g.
-  Combi 6 Gas) instead of the Vario Heat modes. Not confirmed on hardware yet.
+- `truma_inetbox`: `HEATER_HAS_ERROR` also turns on for warnings, e.g. W255 (briefly when the CP Plus
+  starts).
+- `truma_inetbox`: The fan mode select sends Eco/High to a Combi 6 Gas instead of the Vario Heat modes.
+  Not confirmed yet.
 
 ### Documentation
-- README: CP Plus C3, `HEATER_HAS_ERROR` and thanks to Marco added.
+- README: CP Plus C3, `HEATER_HAS_ERROR` and thanks to Marco.
 
 ## [1.0.41] — 2026-10-09 — Aventa: AUTO from HA removed again
 
 ### Removed
-- `truma_inetbox`: climate entity `AIRCON_AUTO` and number `AIRCON_AUTO_TEMPERATURE` from 1.0.40. The
-  CP Plus rejects the command (issue #28). Please delete these entries from your YAML, the AUTO
-  display stays.
+- `truma_inetbox`: `AIRCON_AUTO` and `AIRCON_AUTO_TEMPERATURE` from 1.0.40, the CP Plus rejects the
+  command (issue #28). Please delete them from your YAML.
 
 ### Documentation
 - README and Aventa example updated.
@@ -63,8 +68,7 @@ Tested against:
 
 ### Added
 - `truma_inetbox`: binary sensor `HEATER_MAINS_POWER` (Combi D only) for 230 V shore power at the
-  heater. Experimental and not suitable for automations yet, the change when plugging in is not
-  confirmed yet.
+  heater. Experimental, not confirmed yet.
 
 ### Changed
 - `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` shows "unknown" instead of 0 °C while AUTO is
@@ -164,9 +168,8 @@ Tested against:
 ## [1.0.30] — 2026-09-23 — Heat demand (experimental)
 
 ### Added
-- `truma_inetbox`: Binary sensor `HEATING_DEMAND` and sensors `PID22_BYTE0`/`PID22_BYTE1`,
-  experimental and Combi 4 only (issue #25). `HEATING_DEMAND` shows whether the heater requests
-  heat, not whether the burner is running.
+- `truma_inetbox`: `HEATING_DEMAND` (heat request, not burner status) and `PID22_BYTE0`/`PID22_BYTE1`.
+  Experimental, Combi 4 only (issue #25).
 
 ## [1.0.29] — 2026-09-21 — Unused function warnings
 
@@ -188,8 +191,7 @@ Tested against:
 ## [1.0.26] — 2026-09-15 — Log PID fixed, `OPERATING_STATUS` corrected
 
 ### Fixed
-- `truma_inetbox`: In the VERBOSE log, PID and data of the LIN frames did not match. Only the log
-  output was affected.
+- `truma_inetbox`: Wrong assignment in the VERBOSE log, only the log output was affected.
 
 ### Documentation
 - README: `OPERATING_STATUS` from 5 upwards does not show a running burner, the values depend on the
@@ -232,8 +234,7 @@ Tested against:
 ### Added
 - `truma_cooler`: Selector `model:` (`c44` default, `c69`). C44 configurations without `model:` keep
   working unchanged.
-- `truma_cooler` C69: Two zones with their own target and actual temperature, compressor and device
-  status. On/off applies to the whole box, turbo is not implemented. Example
+- `truma_cooler` C69: two zones with their own target and actual temperature, without turbo. Example
   `ESP32_truma_cooler_C69_example.yaml`.
 
 ## [1.0.20] — 2026-05-12 — Truma Cooler: hardening and state after restart
@@ -256,13 +257,12 @@ Tested against:
 ## [1.0.18] — 2026-04-29 — Thread safety in heater/aircon/clock
 
 ### Changed
-- `truma_inetbox`: Status flags between LIN task and main loop are protected against concurrent
-  access.
+- `truma_inetbox`: Protected against concurrent access.
 
 ## [1.0.17] — 2026-04-29 — Truma Cooler: robustness fixes
 
 ### Changed
-- `truma_cooler`: Code cleanup, access between BLE and app task protected.
+- `truma_cooler`: Code cleanup, protected against concurrent access.
 
 ### Fixed
 - `truma_cooler`: Turbo commands are ignored while the box is off.
@@ -278,11 +278,11 @@ Tested against:
 ## [1.0.15] — 2026-04-23 — Safety and robustness fixes
 
 ### Fixed
-- `truma_inetbox`: Incomplete LIN frames are dropped, full queues are reported in the log.
+- `truma_inetbox`: Incomplete LIN data is dropped.
 - `truma_inetbox`: The operating status "ON 255" was shown as "ON 25".
 - `truma_inetbox`: Without a time server, the clock stayed in update state forever.
 - `truma_cooler`: The target temperature is applied also when the mode changes at the same time.
-- `truma_inetbox`, `truma_cooler`: Access between tasks protected.
+- `truma_inetbox`, `truma_cooler`: Protected against concurrent access.
 
 ## [1.0.14] — 2026-04-21 — Truma Cooler C(XX) integration
 
@@ -302,11 +302,10 @@ Tested against:
 ## [1.0.12] — 2026-04-19 — LIN fixes
 
 ### Fixed
-- `truma_inetbox`: LIN messages over 255 bytes were dropped.
-- `truma_inetbox`: Incoming frames are checked for their length before evaluation.
+- `truma_inetbox`: Long LIN messages were dropped, short ones not checked.
 - `truma_inetbox`: Time comparisons are correct also after the counter rolls over (about every 71
-  minutes), access between tasks protected.
-- `truma_inetbox`: The CRC byte was missing in the log.
+  minutes).
+- `truma_inetbox`: The checksum was missing in the log.
 
 ## [1.0.11] — 2026-04-17 — ESPHome 2026.4.0 compatibility
 
