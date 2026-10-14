@@ -37,6 +37,8 @@ Ein herzliches Dankeschön gilt **[Fabian Schmidt](https://github.com/Fabian-Sch
 
 Dieses Projekt baut außerdem auf der Vorarbeit des [WomoLIN-Projekts](https://github.com/muccc/WomoLIN) und [Daniel Fetts inetbox.py](https://github.com/danielfett/inetbox.py) sowie [mc0110s inetbox2mqtt](https://github.com/mc0110/inetbox2mqtt) auf — ihre Protokollforschung, Log-Dateien und Dokumentation waren von unschätzbarem Wert.
 
+Danke auch an **[Marco (@magior)](https://github.com/magior)**, der die Unterstützung der CP Plus C3 beigesteuert und an seiner eigenen Anlage getestet hat (PR #30).
+
 ---
 
 ## Was dieser Fork ergänzt
@@ -244,6 +246,8 @@ Erfordert ESPHome >= 2026.9.1.
 
 > **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob andere Modelle und insbesondere neuere Diesel-Generationen mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [Issue](https://github.com/havanti/esphome-truma/issues) öffnen.
 
+> **CP Plus:** Am Bench getestet mit einer CP Plus 4.04.01. Seit 1.0.42 läuft auch die ältere CP Plus C3, getestet von Marco an einer C3.00.00 mit Combi 6 Gas (Issue #29). An einer C3 setzt die Komponente die Uhrzeit nicht, die C3 nimmt das nicht an.
+
 ### Hardware-Aufbau
 
 Für den vollständigen Hardware-Aufbau — Teileliste, Verdrahtungsplan, Schritt-für-Schritt-Anleitung und Fehlersuche:
@@ -424,7 +428,7 @@ Folgende `type`-Werte sind verfügbar:
 - `HEATER_MIX_1`
 - `HEATER_MIX_2`
 - `HEATER_ELECTRICITY`
-- `HEATER_HAS_ERROR`
+- `HEATER_HAS_ERROR` — Fehler oder Warnung der Heizung, auch W255 (seit 1.0.42)
 - `HEATING_DEMAND` (experimentell, siehe Sensor)
 - `HEATER_MAINS_POWER` — 230 V Landstrom an der Heizung (experimentell, nur Combi D, siehe Sensor)
 - `TIMER_ACTIVE`

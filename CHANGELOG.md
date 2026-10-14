@@ -12,15 +12,33 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Das Setzen von AUTO aus HA (1.0.40) lehnt der CP Plus ab, es ist wieder entfernt. Der
-Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und Licht der Aventa
-sind bestätigt (Issue #28).
+Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). `HEATER_HAS_ERROR` meldet jetzt
+auch Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige
+und Licht der Aventa sind bestätigt (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.42] — 2026-10-14 — CP Plus C3
+
+### Behoben
+- `truma_inetbox`: An einer CP Plus C3 kamen Anmeldung, Init und Befehle aus HA nur bei wachem Panel
+  an, jetzt auch im Ruhezustand. Die Uhrzeit wird an einer C3 nicht gesetzt, sie nimmt das nicht an.
+  Von Marco an einer CP Plus C3.00.00 mit Combi 6 Gas getestet (Issue #29), an einer CP Plus 4.04.01
+  ohne Rückschritt. Danke an [Marco (@magior)](https://github.com/magior) für die Zuarbeit (PR #30).
+
+### Geändert
+- `truma_inetbox`: `HEATER_HAS_ERROR` geht jetzt bei jeder Fehler- oder Warnmeldung der Heizung an,
+  auch bei W255 (Heizung antwortet nicht), das kommt kurz auch beim Start des CP Plus. Bisher ging der
+  Sensor praktisch nie an.
+- `truma_inetbox`: Die Lüfterauswahl schickt an einer Combi, die sich wie eine Vario Heat meldet (z. B.
+  Combi 6 Gas), Eco/High statt der Vario-Heat-Stufen. An der Hardware noch nicht bestätigt.
+
+### Dokumentation
+- README: CP Plus C3, `HEATER_HAS_ERROR` und Dank an Marco ergänzt.
 
 ## [1.0.41] — 2026-10-09 — Aventa: AUTO aus HA wieder entfernt
 

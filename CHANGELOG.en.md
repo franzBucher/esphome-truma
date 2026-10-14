@@ -12,15 +12,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-Setting AUTO from HA (1.0.40) is rejected by the CP Plus and was removed again. The shore power
-sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the Aventa are
-confirmed (issue #28).
+Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). `HEATER_HAS_ERROR` now also
+reports warnings. The shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display
+and light of the Aventa are confirmed (issue #28).
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.42] — 2026-10-14 — CP Plus C3
+
+### Fixed
+- `truma_inetbox`: On a CP Plus C3, registration, init and commands from HA only went through while the
+  panel was awake, now also in standby. The clock is not set on a C3, it does not accept it. Tested by
+  Marco on a CP Plus C3.00.00 with Combi 6 Gas (issue #29), no regression on a CP Plus 4.04.01. Thanks
+  to [Marco (@magior)](https://github.com/magior) for the contribution (PR #30).
+
+### Changed
+- `truma_inetbox`: `HEATER_HAS_ERROR` now turns on for every error or warning of the heater, also for
+  W255 (heater does not answer), which also shows briefly when the CP Plus starts. Before, the sensor
+  practically never turned on.
+- `truma_inetbox`: The fan mode select sends Eco/High to a Combi that reports like a Vario Heat (e.g.
+  Combi 6 Gas) instead of the Vario Heat modes. Not confirmed on hardware yet.
+
+### Documentation
+- README: CP Plus C3, `HEATER_HAS_ERROR` and thanks to Marco added.
 
 ## [1.0.41] — 2026-10-09 — Aventa: AUTO from HA removed again
 

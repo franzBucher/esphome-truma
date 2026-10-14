@@ -39,6 +39,8 @@ A heartfelt thank you goes to **[Fabian Schmidt](https://github.com/Fabian-Schmi
 
 This project also builds on the groundwork laid by the [WomoLIN project](https://github.com/muccc/WomoLIN) and [Daniel Fett's inetbox.py](https://github.com/danielfett/inetbox.py), as well as [mc0110's inetbox2mqtt](https://github.com/mc0110/inetbox2mqtt) — their protocol research, log files and documentation have been invaluable.
 
+Thanks also to **[Marco (@magior)](https://github.com/magior)**, who contributed the support for the CP Plus C3 and tested it on his own setup (PR #30).
+
 ---
 
 ## What this fork adds
@@ -246,6 +248,8 @@ Requires ESPHome >= 2026.9.1.
 
 > **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether other models — in particular newer diesel generations with a burner developed by Truma themselves (without Eberspächer) — are also compatible has not been verified. Feedback on this is very welcome — please open an [issue](https://github.com/havanti/esphome-truma/issues).
 
+> **CP Plus:** Tested on the bench with a CP Plus 4.04.01. Since 1.0.42 the older CP Plus C3 works as well, tested by Marco on a C3.00.00 with Combi 6 Gas (issue #29). On a C3 the component does not set the clock, the C3 does not accept it.
+
 ### Hardware Setup
 
 For wiring the ESP32-S3 with the TJA1020 LIN transceiver and the Truma connector:
@@ -424,7 +428,7 @@ The following `type` values are available:
 - `HEATER_MIX_1`
 - `HEATER_MIX_2`
 - `HEATER_ELECTRICITY`
-- `HEATER_HAS_ERROR`
+- `HEATER_HAS_ERROR` — error or warning of the heater, also W255 (since 1.0.42)
 - `HEATING_DEMAND` (experimental, see Sensor)
 - `HEATER_MAINS_POWER` — 230 V shore power at the heater (experimental, Combi D only, see Sensor)
 - `TIMER_ACTIVE`
