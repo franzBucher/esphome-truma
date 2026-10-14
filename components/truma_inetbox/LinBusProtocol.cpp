@@ -52,6 +52,12 @@ void LinBusProtocol::lin_message_received_(const uint8_t pid, const uint8_t *mes
       bool my_node_address = message[0] == this->lin_node_address_;
       bool broadcast_address = message[0] == LIN_NAD_BROADCAST;
       if (!my_node_address && !broadcast_address) {
+        // A master request to another node ends any answer still pending for us: the master will not
+        // poll 0x3D for us any more, and a late answer would collide with the other node's response.
+        if (this->has_update_to_send_()) {
+          xQueueReset(this->updates_to_send_);
+          ESP_LOGW(TAG, "Pending LIN answer dropped: master addressed NAD %02X.", message[0]);
+        }
         return;
       }
     }
@@ -115,12 +121,11 @@ void LinBusProtocol::lin_msg_diag_single_(const uint8_t *message, uint8_t length
       response[0] = this->lin_node_address_;
 
       std::array<uint8_t, 5> identifier_response = {};
-      if (this->lin_read_field_by_identifier_(identifier, &identifier_response)) {
-        response[1] = 6; /* bytes length - ignored by CP Plus?*/
+      const uint8_t identifier_len = this->lin_read_field_by_identifier_(identifier, &identifier_response);
+      if (identifier_len > 0) {
+        response[1] = identifier_len + 1; /* PCI: SID + data bytes */
         response[2] = LIN_SID_READ_BY_IDENTIFIER_RESPONSE;
-        auto iterator = response.begin();
-        std::advance(iterator, 3);
-        std::copy(identifier_response.data(), identifier_response.data() + identifier_response.size(), iterator);
+        std::copy(identifier_response.begin(), identifier_response.begin() + identifier_len, response.begin() + 3);
       } else {
         // Not supported - Negative response (see 4.2.6.1 Read by identifier)
         response[1] = 3; /* bytes length*/
