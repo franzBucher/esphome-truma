@@ -246,7 +246,7 @@ Erfordert ESPHome >= 2026.9.1.
 
 > **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob andere Modelle und insbesondere neuere Diesel-Generationen mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [Issue](https://github.com/havanti/esphome-truma/issues) öffnen.
 
-> **CP Plus:** Am Bench getestet mit einer CP Plus 4.04.01. Seit 1.0.42 läuft auch die ältere CP Plus C3, getestet von Marco an einer C3.00.00 mit Combi 6 Gas (Issue #29). An einer C3 setzt die Komponente die Uhrzeit nicht, die C3 nimmt das nicht an.
+> **CP Plus:** Am Prüfaufbau getestet mit einer CP Plus 4.04.01. Seit 1.0.42 läuft auch die ältere CP Plus C3, getestet von Marco an einer C3.00.00 mit Combi 6 Gas (Issue #29). An einer C3 setzt die Komponente die Uhrzeit nicht, die C3 nimmt das nicht an.
 
 ### Hardware-Aufbau
 

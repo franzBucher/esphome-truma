@@ -26,9 +26,9 @@ Getestet mit:
 
 ### Behoben
 - `truma_inetbox`: Heizen mit Temperatur in einem Aufruf (z. B. `climate.set_temperature` mit
-  `hvac_mode: heat`) setzt jetzt die gewünschte Temperatur statt 5 °C (Wasser 40 °C). Am Bench bestätigt.
+  `hvac_mode: heat`) setzt jetzt die gewünschte Temperatur statt 5 °C (Wasser 40 °C). Am Prüfaufbau bestätigt.
 - `truma_inetbox`: Die Uhrzeit wird erneut gesetzt, wenn HA beim ersten Versuch noch nicht verbunden
-  war. Am Bench bestätigt.
+  war. Am Prüfaufbau bestätigt.
 
 ## [1.0.42] — 2026-10-14 — CP Plus C3
 
