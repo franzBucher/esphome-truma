@@ -5,6 +5,9 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.room_climate";
+// Room target when switched on without one (CP Plus default).
+static constexpr uint8_t ROOM_SWITCH_ON_TEMPERATURE = 5;
+
 void TrumaRoomClimate::setup() {
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
     // Publish updated state
@@ -44,8 +47,10 @@ void TrumaRoomClimate::control(const climate::ClimateCall &call) {
     auto status_heater = this->parent_->get_heater()->get_status();
     switch (mode) {
       case climate::CLIMATE_MODE_HEAT:
-        if (status_heater->target_temp_room == TargetTemp::TARGET_TEMP_OFF) {
-          this->parent_->get_heater()->action_heater_room(5);
+        // A target in the same call wins over the switch-on default.
+        if (status_heater->target_temp_room == TargetTemp::TARGET_TEMP_OFF &&
+            !call.get_target_temperature().has_value()) {
+          this->parent_->get_heater()->action_heater_room(ROOM_SWITCH_ON_TEMPERATURE);
         }
         break;
       default:
