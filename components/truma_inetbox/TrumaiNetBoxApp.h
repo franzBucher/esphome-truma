@@ -118,6 +118,9 @@ class TrumaiNetBoxApp : public LinBusProtocol {
 
   // Mark if the initial clock sync was done.
   bool update_status_clock_done = false;
+  // Automatic clock sync attempts and the time of the last one (main loop only).
+  uint8_t clock_sync_attempts_{0};
+  uint32_t clock_sync_last_attempt_{0};
 #endif  // USE_TIME
 
   bool answer_lin_order_(const uint8_t pid) override;

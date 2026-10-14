@@ -10,6 +10,17 @@ namespace truma_inetbox {
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxApp";
 
 static constexpr uint32_t CLOCK_SYNC_DELAY_US = 30 * 1000 * 1000;   // 30 seconds after init before syncing time
+// A failed automatic clock sync (time not valid yet, CP Plus software unknown) is tried again every 60 s, at
+// most 5 times in total. A CP Plus C3 never accepts the write.
+static constexpr uint32_t CLOCK_SYNC_RETRY_US = 60 * 1000 * 1000;
+static constexpr uint8_t CLOCK_SYNC_MAX_ATTEMPTS = 5;
+// Read-by-Identifier (SID B2) answers of the original iNet Box.
+static constexpr uint8_t RBI_PRODUCT_IDENTIFICATION = 0x00;  // supplier, function, variant
+static constexpr uint8_t RBI_PRODUCT_VARIANT = 0x00;
+static constexpr uint8_t RBI_SOFTWARE_VERSION = 0x20;        // shown in the CP Plus device list as T2.02.00
+static constexpr std::array<uint8_t, 3> RBI_SOFTWARE_VERSION_ANSWER = {0x02, 0x02, 0x00};
+static constexpr uint8_t RBI_IDENTIFIER_22 = 0x22;           // unknown usage, asked by C4 panels; init fails if missing
+static constexpr std::array<uint8_t, 3> RBI_IDENTIFIER_22_ANSWER = {0x03, 0x07, 0x00};
 // 20 seconds before retrying the init request: on a CP Plus C3 the device lists and status buffers it triggers take
 // ~13 s.
 static constexpr uint32_t INIT_RETRY_DELAY_US = 20 * 1000 * 1000;
@@ -60,12 +71,19 @@ void TrumaiNetBoxApp::update() {
   // - Time component configured
   // - Update was not done
   // - 30 seconds after init data received
+  // - a failed attempt is retried after CLOCK_SYNC_RETRY_US, at most CLOCK_SYNC_MAX_ATTEMPTS times
   auto init_received_snapshot = this->init_received_.load(std::memory_order_relaxed);
-  if (this->time_ != nullptr && !this->update_status_clock_done && init_received_snapshot > 0) {
+  if (this->time_ != nullptr && !this->update_status_clock_done && init_received_snapshot > 0 &&
+      this->clock_sync_attempts_ < CLOCK_SYNC_MAX_ATTEMPTS) {
+    const uint32_t now = micros();
     // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
-    if ((micros() - init_received_snapshot) > CLOCK_SYNC_DELAY_US) {
-      this->update_status_clock_done = true;
-      this->clock_.action_write_time();
+    const bool init_settled = (now - init_received_snapshot) > CLOCK_SYNC_DELAY_US;
+    const bool retry_due =
+        this->clock_sync_attempts_ == 0 || (now - this->clock_sync_last_attempt_) > CLOCK_SYNC_RETRY_US;
+    if (init_settled && retry_due) {
+      this->clock_sync_attempts_++;
+      this->clock_sync_last_attempt_ = now;
+      this->update_status_clock_done = this->clock_.action_write_time();
     }
   }
 #endif  // USE_TIME
@@ -197,21 +215,17 @@ void TrumaiNetBoxApp::publish_heater_flags_() {
 uint8_t TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {
   // Answers of the original iNet Box (WomoLIN C4.01.01 init logs). Verified on CP-Plus C3.00.00:
   // the panel registers the box without B0 and lists it as T2.02.00.
-  if (identifier == 0x00 /* LIN Product Identification */) {
+  if (identifier == RBI_PRODUCT_IDENTIFICATION) {
     const auto lin_identifier = this->lin_identifier();
     std::copy(lin_identifier.begin(), lin_identifier.end(), response->begin());
-    (*response)[4] = 0x00;  // Variant
-    return 5;
-  } else if (identifier == 0x20 /* Software version shown in the CP Plus device list */) {
-    (*response)[0] = 0x02;
-    (*response)[1] = 0x02;
-    (*response)[2] = 0x00;
-    return 3;
-  } else if (identifier == 0x22 /* unknown usage, asked by C4 panels; init fails if missing */) {
-    (*response)[0] = 0x03;
-    (*response)[1] = 0x07;
-    (*response)[2] = 0x00;
-    return 3;
+    (*response)[lin_identifier.size()] = RBI_PRODUCT_VARIANT;
+    return lin_identifier.size() + 1;
+  } else if (identifier == RBI_SOFTWARE_VERSION) {
+    std::copy(RBI_SOFTWARE_VERSION_ANSWER.begin(), RBI_SOFTWARE_VERSION_ANSWER.end(), response->begin());
+    return RBI_SOFTWARE_VERSION_ANSWER.size();
+  } else if (identifier == RBI_IDENTIFIER_22) {
+    std::copy(RBI_IDENTIFIER_22_ANSWER.begin(), RBI_IDENTIFIER_22_ANSWER.end(), response->begin());
+    return RBI_IDENTIFIER_22_ANSWER.size();
   }
   return 0;
 }
