@@ -5,8 +5,10 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.water_climate";
-// Water target when switched on without one.
-static constexpr uint8_t WATER_SWITCH_ON_TEMPERATURE = 40;
+// Water target range on the CP Plus.
+static constexpr float WATER_TEMPERATURE_MIN = 40;
+static constexpr float WATER_TEMPERATURE_MAX = 80;
+static constexpr float WATER_TEMPERATURE_STEP = 20;
 
 void TrumaWaterClimate::setup() {
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
@@ -49,9 +51,9 @@ climate::ClimateTraits TrumaWaterClimate::traits() {
   auto traits = climate::ClimateTraits();
   traits.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
   traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT});
-  traits.set_visual_min_temperature(40);
-  traits.set_visual_max_temperature(80);
-  traits.set_visual_temperature_step(20);
+  traits.set_visual_min_temperature(WATER_TEMPERATURE_MIN);
+  traits.set_visual_max_temperature(WATER_TEMPERATURE_MAX);
+  traits.set_visual_temperature_step(WATER_TEMPERATURE_STEP);
   return traits;
 }
 }  // namespace truma_inetbox

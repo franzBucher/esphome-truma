@@ -5,8 +5,10 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.room_climate";
-// Room target when switched on without one (CP Plus default).
-static constexpr uint8_t ROOM_SWITCH_ON_TEMPERATURE = 5;
+// Room target range on the CP Plus.
+static constexpr float ROOM_TEMPERATURE_MIN = 5;
+static constexpr float ROOM_TEMPERATURE_MAX = 30;
+static constexpr float ROOM_TEMPERATURE_STEP = 1;
 
 void TrumaRoomClimate::setup() {
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
@@ -108,9 +110,9 @@ climate::ClimateTraits TrumaRoomClimate::traits() {
       climate::CLIMATE_FAN_MEDIUM,
       climate::CLIMATE_FAN_HIGH,
   }});
-  traits.set_visual_min_temperature(5);
-  traits.set_visual_max_temperature(30);
-  traits.set_visual_temperature_step(1);
+  traits.set_visual_min_temperature(ROOM_TEMPERATURE_MIN);
+  traits.set_visual_max_temperature(ROOM_TEMPERATURE_MAX);
+  traits.set_visual_temperature_step(ROOM_TEMPERATURE_STEP);
   return traits;
 }
 }  // namespace truma_inetbox

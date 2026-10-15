@@ -21,6 +21,10 @@ static constexpr uint8_t DIAGNOSTIC_FRAME_SLAVE = 0x3d;
 static constexpr uint8_t LIN_PID_STATUS_2 = 0x22;
 // Read-only: vent mode in byte 5 (issue #25). Forwarded regardless of master/slave classification.
 static constexpr uint8_t LIN_PID_COMMAND_STATUS = 0x20;
+// Combi 4 heater status (issue #25), only used to tag very verbose log lines.
+static constexpr uint8_t LIN_PID_STATUS_1 = 0x21;
+// LIN node address of the heater in diagnostic frames.
+static constexpr uint8_t LIN_NAD_HEATER = 0x01;
 // Experimental, Combi D legacy protocol only: heater status, flag byte 1 bit 1 = 230 V present.
 // Sent by the heater (slave checksum), so forwarded regardless of master/slave classification.
 static constexpr uint8_t LIN_PID_HEATER_STATUS_LEGACY = 0x16;
@@ -45,7 +49,7 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
   void set_cs_pin(GPIOPin *pin) { this->cs_pin_ = pin; }
   void set_fault_pin(GPIOPin *pin) { this->fault_pin_ = pin; }
   void set_observer_mode(bool val) { this->observer_mode_ = val; }
-  bool get_lin_bus_fault() { return fault_on_lin_bus_reported_ > 3; }
+  bool get_lin_bus_fault() { return fault_on_lin_bus_reported_ > LIN_FAULT_REPORT_TICKS; }
 
   void process_lin_msg_queue(TickType_t xTicksToWait);
   void process_log_queue(TickType_t xTicksToWait);
@@ -68,18 +72,19 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
  private:
   // Microseconds per UART Baud
   uint32_t time_per_baud_;
-  // LIN break = 13 bit times minimum (spec allows 9–15)
-  static constexpr uint8_t lin_break_length = 13;
-  // Microseconds per LIN Break
-  uint32_t time_per_lin_break_;
   static constexpr uint8_t frame_length_ = 8 /* bits */ + 1 /* Start bit */ + 2 /* Stop bits */;
-  // Microseconds per UART Byte (UART Frame)
-  uint32_t time_per_pid_;
-  // Microseconds per UART Byte (UART Frame)
+  // A data byte more than this many UART frames after the previous one ends the frame (timeout).
+  static constexpr float FIRST_BYTE_TIMEOUT_FRAMES = 5.0f;
+  // Microseconds until the next data byte counts as timed out
   uint32_t time_per_first_byte_;
-  // Microseconds per UART Byte (UART Frame)
-  uint32_t time_per_byte_;
 
+  // Fault pin: reported after this many consecutive faulty ticks, logged every LIN_FAULT_LOG_EVERY ticks.
+  // On overflow the counter restarts at LIN_FAULT_COUNTER_RESTART instead of 0, so the fault stays reported.
+  static constexpr uint8_t LIN_FAULT_REPORT_TICKS = 3;
+  static constexpr uint8_t LIN_FAULT_LOG_EVERY = 3;
+  static constexpr uint8_t LIN_FAULT_COUNTER_RESTART = 0x0F;
+  static_assert(LIN_FAULT_COUNTER_RESTART > LIN_FAULT_REPORT_TICKS && LIN_FAULT_COUNTER_RESTART % LIN_FAULT_LOG_EVERY == 0,
+                "restart value must keep the fault reported and the log cadence");
   uint8_t fault_on_lin_bus_reported_ = 0;
   bool can_write_lin_answer_ = false;
 

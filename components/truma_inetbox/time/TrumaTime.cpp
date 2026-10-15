@@ -19,7 +19,7 @@ void TrumaTime::setup() {
 
 void TrumaTime::update() {}
 
-void TrumaTime::dump_config() { ESP_LOGCONFIG(TAG, "Truma Time", this); }
+void TrumaTime::dump_config() { ESP_LOGCONFIG(TAG, "Truma Time"); }
 
 bool TrumaTime::read_time() {
   if (!this->parent_->get_clock()->get_status_valid()) {

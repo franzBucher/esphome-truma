@@ -11,22 +11,23 @@ namespace truma_cooler {
 static const char *const TAG = "truma_cooler.c69";
 
 void TrumaCoolerC69::handle_status_(const uint8_t *data) {
-  bool device_on = (data[4] & C69_DEVICE_ON_MASK) != 0;
+  bool device_on = (data[STATUS_DEVICE_STATE] & C69_DEVICE_ON_MASK) != 0;
   device_is_on_.store(device_on);
   // Compressor idle bit is only meaningful while powered on.
-  bool compressor_running = device_on && (data[5] & C69_COMPRESSOR_IDLE_MASK) == 0;
+  const uint8_t compressor_state = data[STATUS_COMPRESSOR_STATE];
+  bool compressor_running = device_on && (compressor_state & C69_COMPRESSOR_IDLE_MASK) == 0;
 
-  float zone1_interior = (int8_t) data[6];
-  int8_t zone1_setpoint = (int8_t) data[7];
-  float zone2_interior = (int8_t) data[8];
-  int8_t zone2_setpoint = (int8_t) data[9];
+  float zone1_interior = (int8_t) data[STATUS_ZONE1_TEMPERATURE];
+  int8_t zone1_setpoint = (int8_t) data[STATUS_ZONE1_SETPOINT];
+  float zone2_interior = (int8_t) data[STATUS_ZONE2_TEMPERATURE];
+  int8_t zone2_setpoint = (int8_t) data[STATUS_ZONE2_SETPOINT];
 
   ESP_LOGD(TAG, "Status: device=%s compressor=%s (byte5=0x%02X) "
                 "z1: interior=%.0f°C setpoint=%d°C | z2: interior=%.0f°C setpoint=%d°C",
-           device_on ? "ON" : "OFF", compressor_running ? "RUNNING" : "OFF", data[5],
+           device_on ? "ON" : "OFF", compressor_running ? "RUNNING" : "OFF", compressor_state,
            zone1_interior, zone1_setpoint, zone2_interior, zone2_setpoint);
 
-  // Defer entity mutations to the main loop — gattc notifications run on the BT task.
+  // defer(): entity updates stay out of the gattc callback (queued to the main loop since ESPHome 2026.9).
   this->defer([this, device_on, compressor_running, zone1_interior, zone1_setpoint,
                zone2_interior, zone2_setpoint]() {
     if (device_on_sensor_ != nullptr)

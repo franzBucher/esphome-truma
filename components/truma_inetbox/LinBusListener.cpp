@@ -42,10 +42,7 @@ void LinBusListener::dump_config() {
 void LinBusListener::setup() {
   ESP_LOGCONFIG(TAG, "Setting up LIN BUS...");
   this->time_per_baud_ = (1000.0f * 1000.0f / this->parent_->get_baud_rate());
-  this->time_per_lin_break_ = this->time_per_baud_ * this->lin_break_length * 1.1f;
-  this->time_per_pid_ = this->time_per_baud_ * this->frame_length_ * 1.1f;
-  this->time_per_first_byte_ = this->time_per_baud_ * this->frame_length_ * 5.0f;
-  this->time_per_byte_ = this->time_per_baud_ * this->frame_length_ * 1.1f;
+  this->time_per_first_byte_ = this->time_per_baud_ * this->frame_length_ * FIRST_BYTE_TIMEOUT_FRAMES;
 
   if (this->cs_pin_ != nullptr) {
     this->cs_pin_->setup();
@@ -130,11 +127,9 @@ bool LinBusListener::check_for_lin_fault_() {
       if (this->fault_on_lin_bus_reported_ < 0xFF) {
         this->fault_on_lin_bus_reported_++;
       } else {
-        // On overflow, reset to 0x0F (not 0) so get_lin_bus_fault() (checks > 3) stays true
-        // and logging continues every 3rd tick (0x0F % 3 == 0).
-        this->fault_on_lin_bus_reported_ = 0x0F;
+        this->fault_on_lin_bus_reported_ = LIN_FAULT_COUNTER_RESTART;
       }
-      if (this->fault_on_lin_bus_reported_ % 3 == 0) {
+      if (this->fault_on_lin_bus_reported_ % LIN_FAULT_LOG_EVERY == 0) {
         QUEUE_LOG_MSG log_msg = QUEUE_LOG_MSG();
         log_msg.type = QUEUE_LOG_MSG_TYPE::ERROR_CHECK_FOR_LIN_FAULT_DETECTED;
         TRUMA_LOGE(log_msg);
@@ -428,9 +423,9 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
         break;
       case QUEUE_LOG_MSG_TYPE::VERBOSE_READ_LIN_FRAME_MSG:
         // Mark the PID of the TRUMA Combi heater as very verbose message.
-        if (current_PID == 0x20 || current_PID == 0x21 || current_PID == 0x22 ||
+        if (current_PID == LIN_PID_COMMAND_STATUS || current_PID == LIN_PID_STATUS_1 || current_PID == LIN_PID_STATUS_2 ||
             ((current_PID == DIAGNOSTIC_FRAME_MASTER || current_PID == DIAGNOSTIC_FRAME_SLAVE) &&
-             log_msg.data[0] == 0x01 /* ID of heater */)) {
+             log_msg.data[0] == LIN_NAD_HEATER)) {
           ESP_LOGVV(TAG, "PID %02X      %s %s %s", current_PID, format_hex_pretty(log_msg.data, log_msg.len).c_str(),
                     log_msg.message_source_know ? (log_msg.message_from_master ? " - MASTER" : " - SLAVE") : "",
                     log_msg.current_data_valid ? "" : "INVALID");

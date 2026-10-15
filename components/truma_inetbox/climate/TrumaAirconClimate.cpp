@@ -5,6 +5,10 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.aircon_climate";
+// Aventa target range on the CP Plus.
+static constexpr float AIRCON_TEMPERATURE_MIN = 16;
+static constexpr float AIRCON_TEMPERATURE_MAX = 31;
+static constexpr float AIRCON_TEMPERATURE_STEP = 1;
 
 void TrumaAirconClimate::setup() {
   this->parent_->get_aircon_manual()->add_on_message_callback([this](const StatusFrameAirconManual *status) {
@@ -52,9 +56,9 @@ climate::ClimateTraits TrumaAirconClimate::traits() {
       climate::CLIMATE_FAN_HIGH,
   }});
 
-  traits.set_visual_min_temperature(this->visual_min_temperature_);
-  traits.set_visual_max_temperature(this->visual_max_temperature_);
-  traits.set_visual_temperature_step(this->visual_temperature_step_);
+  traits.set_visual_min_temperature(AIRCON_TEMPERATURE_MIN);
+  traits.set_visual_max_temperature(AIRCON_TEMPERATURE_MAX);
+  traits.set_visual_temperature_step(AIRCON_TEMPERATURE_STEP);
   return traits;
 }
 

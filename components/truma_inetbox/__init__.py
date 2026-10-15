@@ -24,7 +24,6 @@ from esphome.components.uart import (
     CONF_PARITY,
     KEY_UART_DEVICES,
 )
-from .entity_helpers import count_id_usage  # noqa: F401
 
 DEPENDENCIES = ["uart"]
 CODEOWNERS = ["@Fabian-Schmidt"]
@@ -33,7 +32,6 @@ CONF_TRUMA_INETBOX_ID = "truma_inetbox_id"
 CONF_LIN_CHECKSUM = "lin_checksum"
 CONF_FAULT_PIN = "fault_pin"
 CONF_OBSERVER_MODE = "observer_mode"
-CONF_NUMBER_OF_CHILDREN = "number_of_children"
 CONF_ON_HEATER_MESSAGE = "on_heater_message"
 
 truma_inetbox_ns = cg.esphome_ns.namespace("truma_inetbox")
@@ -251,10 +249,11 @@ CONF_SUPPORTED_ELECTRIC_POWER_LEVEL = {
     "1800": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
     "1800W": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
     "1800 W": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
-    "1.8kW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
-    "1,8kW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
-    "1.8 kW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
-    "1,8 kW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
+    # cv.enum(..., upper=True) uppercases the input, so these keys must be uppercase too.
+    "1.8KW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
+    "1,8KW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
+    "1.8 KW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
+    "1,8 KW": ElectricPowerLevel_dummy_ns.ELECTRIC_POWER_LEVEL_1800,
 }
 
 # `HeatingMode` is a enum class and not a namespace but it works.

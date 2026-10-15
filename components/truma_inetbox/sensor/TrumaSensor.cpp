@@ -6,6 +6,8 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.sensor";
+// Error code as shown on the CP Plus: class * 100 + number.
+static constexpr float ERROR_CODE_CLASS_FACTOR = 100.0f;
 
 void TrumaSensor::setup() {
   if (this->type_ == TRUMA_SENSOR_TYPE::PID22_BYTE0 || this->type_ == TRUMA_SENSOR_TYPE::PID22_BYTE1) {
@@ -52,7 +54,7 @@ void TrumaSensor::setup() {
         this->publish_state(static_cast<float>(status_heater->operating_status));
         break;
       case TRUMA_SENSOR_TYPE::HEATER_ERROR_CODE: {
-        float errorcode = status_heater->error_code_high * 100.0f + status_heater->error_code_low;
+        float errorcode = status_heater->error_code_high * ERROR_CODE_CLASS_FACTOR + status_heater->error_code_low;
         this->publish_state(errorcode);
         break;
       }

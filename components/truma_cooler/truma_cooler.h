@@ -45,6 +45,15 @@ static constexpr uint8_t FRAME_LEN = 16;
 static constexpr uint8_t HEADER_B0 = 0xAA;
 static constexpr uint8_t HEADER_B1 = 0xC1;
 static constexpr uint8_t RESPONSE_TYPE = 0xF2;
+static constexpr uint8_t COMMAND_TYPE = 0xF1;
+// Status notify byte offsets; what each byte means is model-specific, see truma_cooler_c44.h / _c69.h.
+static constexpr uint8_t STATUS_DEVICE_STATE = 4;
+static constexpr uint8_t STATUS_COMPRESSOR_STATE = 5;
+static constexpr uint8_t STATUS_ZONE1_TEMPERATURE = 6;
+static constexpr uint8_t STATUS_ZONE1_SETPOINT = 7;
+static constexpr uint8_t STATUS_ZONE2_TEMPERATURE = 8;
+static constexpr uint8_t STATUS_ZONE2_SETPOINT = 9;
+static constexpr uint8_t STATUS_C44_AMBIENT = 11;
 
 // Setpoint-write zone selector (command byte [9]).
 static constexpr uint8_t ZONE1_SELECT = 0x01;

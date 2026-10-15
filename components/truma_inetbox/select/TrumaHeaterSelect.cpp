@@ -83,8 +83,8 @@ void TrumaHeaterSelect::control(const std::string &value) {
   }
   // Start from the pending target, so a temperature sent just before is not overwritten.
   float temp = temp_code_to_decimal(this->parent_->get_heater()->pending_target_temp_room(), 0);
-  if (index.value() > 0 && temp < 5) {
-    temp = 5;
+  if (index.value() > 0 && temp < ROOM_SWITCH_ON_TEMPERATURE) {
+    temp = ROOM_SWITCH_ON_TEMPERATURE;
   }
 
   switch (this->type_) {

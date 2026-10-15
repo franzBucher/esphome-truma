@@ -29,6 +29,13 @@ static constexpr TickType_t QUEUE_WAIT_BLOCKING = portMAX_DELAY;
 static constexpr uint32_t LIN_TASK_STACK_SIZE = 4096;
 // Run the UART and LIN tasks on core 0, ESPHome runs on core 1.
 static constexpr BaseType_t LIN_TASK_CORE = 0;
+// RX interrupt tuning: fire on the first byte instead of the driver default (120) and after a short
+// idle, so the LIN state machine sees every byte without delay.
+static constexpr uint8_t UART_RXFIFO_FULL_THRESH = 1;
+static constexpr uint8_t UART_RX_TIMEOUT_THRESH = 10;
+static constexpr uint8_t UART_TXFIFO_EMPTY_THRESH = 10;  // UART_EMPTY_THRESH_DEFAULT
+// How long uartEventTask_ waits for the UART driver's event queue before giving up.
+static constexpr uint32_t UART_QUEUE_WAIT_MAX_MS = 5000;
 
 void LinBusListener::setup_framework() {
   // uartSetFastReading
@@ -39,13 +46,12 @@ void LinBusListener::setup_framework() {
   // Tweak the fifo settings so data is available as soon as the first byte is received.
   // If not it will wait either until fifo is filled or a certain time has passed.
   uart_intr_config_t uart_intr{};
-  uart_intr.intr_enable_mask =
-      UART_RXFIFO_FULL_INT_ENA_M | UART_RXFIFO_TOUT_INT_ENA_M;  // only these IRQs - no BREAK, PARITY or OVERFLOW
-  uart_intr.rxfifo_full_thresh =
-      1;  // 1 byte threshold (default 120 would delay first byte significantly)
-  uart_intr.rx_timeout_thresh =
-      10;  // 10 tick timeout (sufficient for short LIN frames)
-  uart_intr.txfifo_empty_intr_thresh = 10;  // UART_EMPTY_THRESH_DEFAULT
+  // uart_intr_config() ORs this into the driver's mask, so BREAK (feeds the UART_BREAK events),
+  // PARITY and OVERFLOW from uart_driver_install() stay enabled.
+  uart_intr.intr_enable_mask = UART_RXFIFO_FULL_INT_ENA_M | UART_RXFIFO_TOUT_INT_ENA_M;
+  uart_intr.rxfifo_full_thresh = UART_RXFIFO_FULL_THRESH;
+  uart_intr.rx_timeout_thresh = UART_RX_TIMEOUT_THRESH;
+  uart_intr.txfifo_empty_intr_thresh = UART_TXFIFO_EMPTY_THRESH;
   esp_err_t err = uart_intr_config((uart_port_t) uart_num, &uart_intr);
   if (err != ESP_OK) {
     ESP_LOGE(TAG, " -- UART%d interrupt config failed: %s", uart_num, esp_err_to_name(err));
@@ -54,7 +60,7 @@ void LinBusListener::setup_framework() {
   // Creating UART event Task
   xTaskCreatePinnedToCore(LinBusListener::uartEventTask_,
                           "uart_event_task",                      // name
-                          LIN_TASK_STACK_SIZE,                    // stack size (in words)
+                          LIN_TASK_STACK_SIZE,                    // stack size (in bytes)
                           this,                                   // input params
                           UART_EVENT_TASK_PRIORITY,               // priority
                           &this->uartEventTaskHandle_,            // handle
@@ -67,7 +73,7 @@ void LinBusListener::setup_framework() {
   // Creating LIN msg event Task
   xTaskCreatePinnedToCore(LinBusListener::eventTask_,
                           "lin_event_task",                       // name
-                          LIN_TASK_STACK_SIZE,                    // stack size (in words)
+                          LIN_TASK_STACK_SIZE,                    // stack size (in bytes)
                           this,                                   // input params
                           LIN_EVENT_TASK_PRIORITY,                // priority
                           &this->eventTaskHandle_,                // handle
@@ -90,8 +96,9 @@ void LinBusListener::uartEventTask_(void *args) {
   uint32_t waited_ms = 0;
   while (*uartEventQueue == nullptr) {
     vTaskDelay(pdMS_TO_TICKS(1));
-    if (++waited_ms > 5000) {
-      ESP_LOGE(TAG, "UART%d event queue not available after 5s -- UART setup failed?", uart_num);
+    if (++waited_ms > UART_QUEUE_WAIT_MAX_MS) {
+      ESP_LOGE(TAG, "UART%d event queue not available after %u ms -- UART setup failed?", uart_num,
+               (unsigned) UART_QUEUE_WAIT_MAX_MS);
       vTaskDelete(NULL);
       return;
     }

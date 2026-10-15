@@ -14,7 +14,8 @@ namespace truma_cooler {
 //   [5]  0x01 = running / 0x05, 0x0D = turbo  compressor state
 //   [6]  interior temperature (signed int8, °C)
 //   [7]  setpoint echoed back (signed int8, °C)
-//   [11] ambient/outside temperature in 0.1 °C (signed int8)
+//   [11] value in 0.1 °C steps, meaning unclear (exposed as "ambient temperature", not the outside
+//        temperature, see README)
 // Decoding is by exact byte value — do NOT change it (differs from the C69,
 // whose byte [5] is a bitfield). See truma_cooler_c69.* for that model.
 // ===========================================================================

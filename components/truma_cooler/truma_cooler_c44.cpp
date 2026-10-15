@@ -22,23 +22,24 @@ static constexpr uint8_t CMD_TURBO_OFF[FRAME_LEN] = {
 };
 
 void TrumaCoolerC44::handle_status_(const uint8_t *data) {
-  bool device_on = (data[4] == C44_DEVICE_ON);
+  bool device_on = (data[STATUS_DEVICE_STATE] == C44_DEVICE_ON);
   device_is_on_.store(device_on);
-  bool turbo_running = (data[5] == C44_COMPRESSOR_TURBO || data[5] == C44_COMPRESSOR_TURBO_ALT);
-  bool compressor_running = (data[5] == C44_COMPRESSOR_RUNNING || turbo_running);
-  float interior_temp = (int8_t) data[6];  // interior temperature in °C (signed)
-  int8_t setpoint = (int8_t) data[7];      // setpoint echoed back from device
+  const uint8_t compressor_state = data[STATUS_COMPRESSOR_STATE];
+  bool turbo_running = (compressor_state == C44_COMPRESSOR_TURBO || compressor_state == C44_COMPRESSOR_TURBO_ALT);
+  bool compressor_running = (compressor_state == C44_COMPRESSOR_RUNNING || turbo_running);
+  float interior_temp = (int8_t) data[STATUS_ZONE1_TEMPERATURE];  // interior temperature in °C (signed)
+  int8_t setpoint = (int8_t) data[STATUS_ZONE1_SETPOINT];        // setpoint echoed back from device
   // Signed: HCI snoops only showed positive ambient temps, but int8_t extends
   // the range to -12.8..+12.7°C without breaking observed values.
-  float ambient_temp = (int8_t) data[11] * 0.1f;
+  float ambient_temp = (int8_t) data[STATUS_C44_AMBIENT] * 0.1f;
 
   ESP_LOGD(TAG, "Status: device=%s compressor=%s turbo=%s (byte5=0x%02X) interior=%.0f°C ambient=%.1f°C setpoint=%d°C",
            device_on ? "ON" : "OFF",
            compressor_running ? "RUNNING" : "OFF",
            turbo_running ? "ON" : "OFF",
-           data[5], interior_temp, ambient_temp, setpoint);
+           compressor_state, interior_temp, ambient_temp, setpoint);
 
-  // Defer entity mutations to the main loop — gattc notifications run on the BT task.
+  // defer(): entity updates stay out of the gattc callback (queued to the main loop since ESPHome 2026.9).
   this->defer([this, device_on, compressor_running, turbo_running, interior_temp, ambient_temp, setpoint]() {
     if (temperature_sensor_ != nullptr)
       temperature_sensor_->publish_state(interior_temp);

@@ -1,18 +1,15 @@
 #pragma once
 
-#include "TrumaStausFrameResponseStorage.h"
+#include "TrumaStausFrameStorage.h"
 #include "TrumaStructs.h"
 
 namespace esphome {
 namespace truma_inetbox {
 
-class TrumaiNetBoxAppAirconAuto
-    : public TrumaStausFrameResponseStorage<StatusFrameAirconAuto, StatusFrameAirconAutoResponse> {
+// Read-only since 1.0.41: the CP Plus rejects writes to the AUTO frame, only the status is kept.
+class TrumaiNetBoxAppAirconAuto : public TrumaStausFrameStorage<StatusFrameAirconAuto> {
  public:
-  StatusFrameAirconAutoResponse *update_prepare() override;
-  void create_update_data(StatusFrame *response, uint8_t *response_len, uint8_t command_counter) override;
   void dump_data() const override;
-  bool can_update() override;
 };
 
 }  // namespace truma_inetbox

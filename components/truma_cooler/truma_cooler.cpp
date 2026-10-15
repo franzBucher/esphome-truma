@@ -65,8 +65,8 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       if (param->open.status == ESP_GATT_OK) {
         ESP_LOGI(TAG, "Connected to TrumaCooler");
         connected_.store(true);
-        // gattc events fire on the BT controller task. Defer entity mutations
-        // (publish_state, climate field writes, scheduler ops) to the main loop.
+        // Since ESPHome 2026.9 gattc events are queued to the main loop (older versions: BT task).
+        // defer() keeps this callback short either way.
         this->defer([this]() {
           if (connected_sensor_ != nullptr) connected_sensor_->publish_state(true);
           if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
@@ -84,7 +84,7 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       poll_enabled_.store(false);
       write_handle_.store(0);
       device_is_on_.store(false);
-      // Defer scheduler op + publishes to main loop (BT task is not the right context).
+      // defer(): keep the callback short, see above.
       this->defer([this]() {
         this->on_disconnect_cleanup_();
         if (connected_sensor_ != nullptr) connected_sensor_->publish_state(false);
@@ -177,7 +177,7 @@ void TrumaCooler::set_mode(bool on) {
 }
 
 void TrumaCooler::send_setpoint_frame_(uint8_t byte7, uint8_t byte8, uint8_t zone_select) {
-  uint8_t cmd[FRAME_LEN] = {0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, byte7,
+  uint8_t cmd[FRAME_LEN] = {HEADER_B0, HEADER_B1, COMMAND_TYPE, 0x00, 0x00, 0x00, 0x00, byte7,
                             byte8, zone_select, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   cmd[FRAME_LEN - 1] = calculate_checksum_(cmd, FRAME_LEN - 1);
   send_command(cmd, sizeof(cmd));

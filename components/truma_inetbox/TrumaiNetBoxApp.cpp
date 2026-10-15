@@ -41,7 +41,6 @@ static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_ZERO = 0x0000;
 static constexpr uint8_t TRUMA_TRANSFER_LEN = 41;  // SID + 40-byte buffer
 
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
-  this->airconAuto_.set_parent(this);
   this->airconManual_.set_parent(this);
   this->clock_.set_parent(this);
   // this->config_.set_parent(this);
@@ -251,7 +250,6 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     // Example: BA.00.1F.00.1E.00.00.22.FF.FF.FF (11)
     memset(response, 0, sizeof(response));
     auto response_frame = reinterpret_cast<StatusFrame *>(response);
-    bool answered = true;
 
     // The order must match with the method 'has_update_to_submit_'.
     if (this->init_received_.load(std::memory_order_relaxed) == 0) {
@@ -267,9 +265,6 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     } else if (this->airconManual_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending aircon manual update");
       this->airconManual_.create_update_data(response_frame, return_len, this->message_counter++);
-    } else if (this->airconAuto_.has_update()) {
-      ESP_LOGD(TAG, "Requested read: Sending aircon auto update");
-      this->airconAuto_.create_update_data(response_frame, return_len, this->message_counter++);
 #ifdef USE_TIME
     } else if (this->clock_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending clock update");
@@ -277,14 +272,12 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
 #endif  // USE_TIME
     } else {
       ESP_LOGW(TAG, "Requested read: CP Plus asks for an update, but I have none.");
-      answered = false;
+      return nullptr;
     }
-    if (answered) {
-      if (*return_len > 0 && *return_len < TRUMA_TRANSFER_LEN) {
-        *return_len = TRUMA_TRANSFER_LEN;
-      }
-      return response;
+    if (*return_len > 0 && *return_len < TRUMA_TRANSFER_LEN) {
+      *return_len = TRUMA_TRANSFER_LEN;
     }
+    return response;
   }
 
   if (message_len < sizeof(StatusFrame) && message[0] == LIN_SID_FIll_STATE_BUFFFER) {
@@ -494,7 +487,7 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
     // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
     return init_request_sent == 0 || micros() - init_request_sent > INIT_RETRY_DELAY_US;
   }
-  return this->airconAuto_.has_update() || this->airconManual_.has_update() || this->clock_.has_update() ||
+  return this->airconManual_.has_update() || this->clock_.has_update() ||
          this->heater_.has_update() || this->timer_.has_update();
 }
 

@@ -13,6 +13,12 @@
 namespace esphome {
 namespace uart {
 static const char *const TAG = "uart.idf";
+// RX flow-control threshold (IDF default UART_FIFO_LEN - 6); hardware flow control itself is off.
+static constexpr uint8_t UART_RX_FLOW_CTRL_THRESH = 122;
+// Depth of the driver event queue handed to uart_driver_install().
+static constexpr int UART_EVENT_QUEUE_SIZE = 20;
+// Blocking read timeout; LIN bytes arrive within a few ms or not at all.
+static constexpr uint32_t UART_READ_TIMEOUT_MS = 20;
 
 uart_config_t IDFUARTComponent::get_config_() {
   uart_parity_t parity = UART_PARITY_DISABLE;
@@ -51,7 +57,7 @@ uart_config_t IDFUARTComponent::get_config_() {
   uart_config.stop_bits = this->stop_bits_ == 1 ? UART_STOP_BITS_1 : UART_STOP_BITS_2;
   uart_config.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
   uart_config.source_clk = UART_SCLK_DEFAULT;
-  uart_config.rx_flow_ctrl_thresh = 122;
+  uart_config.rx_flow_ctrl_thresh = UART_RX_FLOW_CTRL_THRESH;
 
   return uart_config;
 }
@@ -83,7 +89,7 @@ void IDFUARTComponent::setup() {
                             0,  // UART TX ring buffer size.
                                 // If set to zero, driver will not use TX buffer, TX function will block task until all
                                 // data have been sent out.
-                            20, const_cast<QueueHandle_t *>(&this->uart_event_queue_), 0);
+                            UART_EVENT_QUEUE_SIZE, const_cast<QueueHandle_t *>(&this->uart_event_queue_), 0);
   if (err != ESP_OK) {
     ESP_LOGW(TAG, "uart_driver_install failed: %s", esp_err_to_name(err));
     this->mark_failed();
@@ -158,7 +164,7 @@ bool IDFUARTComponent::peek_byte(uint8_t *data) {
   if (this->has_peek_) {
     *data = this->peek_byte_;
   } else {
-    int len = uart_read_bytes(this->uart_num_, data, 1, pdMS_TO_TICKS(20));
+    int len = uart_read_bytes(this->uart_num_, data, 1, pdMS_TO_TICKS(UART_READ_TIMEOUT_MS));
     if (len == 0) {
       *data = 0;
     } else {
@@ -180,14 +186,15 @@ bool IDFUARTComponent::read_array(uint8_t *data, size_t len) {
     this->has_peek_ = false;
   }
   if (length_to_read > 0)
-    uart_read_bytes(this->uart_num_, data, length_to_read, pdMS_TO_TICKS(20));
+    uart_read_bytes(this->uart_num_, data, length_to_read, pdMS_TO_TICKS(UART_READ_TIMEOUT_MS));
   return true;
 }
 
 size_t IDFUARTComponent::available() {
-  size_t available;
-
-  uart_get_buffered_data_len(this->uart_num_, &available);
+  size_t available = 0;
+  if (uart_get_buffered_data_len(this->uart_num_, &available) != ESP_OK) {
+    return 0;
+  }
   if (this->has_peek_)
     available++;
 

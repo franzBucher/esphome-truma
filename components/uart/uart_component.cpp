@@ -4,6 +4,8 @@ namespace esphome {
 namespace uart {
 
 static const char *const TAG = "uart";
+// How long a blocking read waits for the requested bytes.
+static constexpr uint32_t UART_READ_WAIT_MS = 100;
 
 bool UARTComponent::check_read_timeout_(size_t len) {
   if (this->available() >= len)
@@ -11,7 +13,7 @@ bool UARTComponent::check_read_timeout_(size_t len) {
 
   uint32_t start_time = millis();
   while (this->available() < len) {
-    if (millis() - start_time > 100) {
+    if (millis() - start_time > UART_READ_WAIT_MS) {
       ESP_LOGE(TAG, "Reading from UART timed out at byte %u!", (unsigned) this->available());
       return false;
     }
