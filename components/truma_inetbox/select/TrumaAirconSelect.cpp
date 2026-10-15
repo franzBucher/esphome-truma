@@ -13,20 +13,20 @@ void TrumaAirconSelect::setup() {
       case TRUMA_SELECT_TYPE::AIRCON_MODE:
         switch (status->mode) {
           case AirconMode::AIRCON_MODE_VENTILATION:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::VENTILATION).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::VENTILATION);
             break;
           case AirconMode::AIRCON_MODE_COOLING:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::COOLING).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::COOLING);
             break;
           case AirconMode::AIRCON_MODE_HEATING:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::HEATING).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::HEATING);
             break;
           case AirconMode::AIRCON_MODE_AUTO:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::AUTO).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::AUTO);
             break;
           case AirconMode::AIRCON_MODE_OFF:
           default:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::OFF).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_MODE::OFF);
             break;
         }
         break;
@@ -34,22 +34,22 @@ void TrumaAirconSelect::setup() {
       case TRUMA_SELECT_TYPE::AIRCON_VENT_MODE:
         switch (status->vent_mode) {
           case AirconVentMode::AIRCON_VENT_LOW:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_LOW).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_LOW);
             break;
           case AirconVentMode::AIRCON_VENT_MID:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_MID).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_MID);
             break;
           case AirconVentMode::AIRCON_VENT_HIGH:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_HIGH).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_HIGH);
             break;
           case AirconVentMode::AIRCON_VENT_NIGHT:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_NIGHT).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_NIGHT);
             break;
           case AirconVentMode::AIRCON_VENT_AUTO:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_AUTO).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_AUTO);
             break;
           default:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_LOW).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_AIRCON_VENT_MODE::VENT_LOW);
             break;
         }
         break;

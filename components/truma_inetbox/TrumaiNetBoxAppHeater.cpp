@@ -75,6 +75,20 @@ HeatingMode TrumaiNetBoxAppHeater::fan_mode_heating_mode(bool high) const {
   return high ? HeatingMode::HEATING_MODE_HIGH : HeatingMode::HEATING_MODE_ECO;
 }
 
+TargetTemp TrumaiNetBoxAppHeater::pending_target_temp_room() const {
+  if (this->update_status_prepared_.load() || this->update_status_stale_.load()) {
+    return this->update_status_.target_temp_room;
+  }
+  return this->data_.target_temp_room;
+}
+
+TargetTemp TrumaiNetBoxAppHeater::pending_target_temp_water() const {
+  if (this->update_status_prepared_.load() || this->update_status_stale_.load()) {
+    return this->update_status_.target_temp_water;
+  }
+  return this->data_.target_temp_water;
+}
+
 bool TrumaiNetBoxAppHeater::action_heater_room(uint8_t temperature, HeatingMode mode) {
   if (!this->can_update()) {
     ESP_LOGW(TAG, "Cannot update Truma.");

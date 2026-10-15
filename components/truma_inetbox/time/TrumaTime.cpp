@@ -32,10 +32,12 @@ bool TrumaTime::read_time() {
                          .hour = status_clock->clock_hour,
                          .day_of_week = 1,
                          .day_of_month = 1,
-                         .day_of_year = 1,  // ignored by recalc_timestamp_utc(false)
+                         .day_of_year = 1,  // ignored by recalc_timestamp_local()
                          .month = 1,
                          .year = 2020};
-  if (!rtc_time.is_valid()) {
+  // The CP Plus clock is wall time, so build the epoch from it as local time.
+  rtc_time.recalc_timestamp_local();
+  if (!rtc_time.is_valid() || rtc_time.timestamp == -1) {
     ESP_LOGE(TAG, "Invalid RTC time, not syncing to system clock.");
     return false;
   }

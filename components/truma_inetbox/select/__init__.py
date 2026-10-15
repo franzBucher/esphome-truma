@@ -68,8 +68,16 @@ def set_default_based_on_type():
         # set defaults based on sensor type:
         if CONF_ICON not in config:
             config[CONF_ICON] = CONF_SUPPORTED_TYPE[config[CONF_TYPE]][CONF_ICON]
+        expected = CONF_SUPPORTED_TYPE[config[CONF_TYPE]][CONF_OPTIONS]
         if CONF_OPTIONS not in config:
-            config[CONF_OPTIONS] = CONF_SUPPORTED_TYPE[config[CONF_TYPE]][CONF_OPTIONS]
+            config[CONF_OPTIONS] = expected
+        elif len(config[CONF_OPTIONS]) != len(expected):
+            # The C++ side publishes by position, a shorter list would hit a missing index.
+            raise cv.Invalid(
+                f"options for {config[CONF_TYPE]} need exactly {len(expected)} entries, "
+                f"in this order: {', '.join(expected)}",
+                path=[CONF_OPTIONS],
+            )
         return config
 
     return set_defaults_

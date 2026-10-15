@@ -6,9 +6,6 @@
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
-#ifdef USE_UART_DEBUGGER
-#include "esphome/core/automation.h"
-#endif
 
 namespace esphome {
 namespace uart {
@@ -19,13 +16,6 @@ enum UARTParityOptions {
   UART_CONFIG_PARITY_ODD,
 };
 
-#ifdef USE_UART_DEBUGGER
-enum UARTDirection {
-  UART_DIRECTION_RX,
-  UART_DIRECTION_TX,
-  UART_DIRECTION_BOTH,
-};
-#endif
 
 const LogString *parity_to_str(UARTParityOptions parity);
 
@@ -68,11 +58,6 @@ class UARTComponent {
   void set_baud_rate(uint32_t baud_rate) { baud_rate_ = baud_rate; }
   uint32_t get_baud_rate() const { return baud_rate_; }
 
-#ifdef USE_UART_DEBUGGER
-  void add_debug_callback(std::function<void(UARTDirection, uint8_t)> &&callback) {
-    this->debug_callback_.add(std::move(callback));
-  }
-#endif
 
  protected:
   virtual void check_logger_conflict() = 0;
@@ -85,9 +70,6 @@ class UARTComponent {
   uint8_t stop_bits_{0};
   uint8_t data_bits_{0};
   UARTParityOptions parity_{UART_CONFIG_PARITY_NONE};
-#ifdef USE_UART_DEBUGGER
-  CallbackManager<void(UARTDirection, uint8_t)> debug_callback_{};
-#endif
 };
 
 }  // namespace uart

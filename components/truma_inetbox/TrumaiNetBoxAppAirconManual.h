@@ -17,7 +17,6 @@ class TrumaiNetBoxAppAirconManual
   bool action_set_temp(uint8_t temperature);
   bool action_set_mode(AirconMode mode);
   bool action_set_vent_mode(AirconVentMode vent_mode);
-  bool action_aircon_manual(uint8_t temperature, AirconMode mode, AirconVentMode vent_mode);
   bool action_set_light(uint8_t level);
 };
 

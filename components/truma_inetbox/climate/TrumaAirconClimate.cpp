@@ -19,26 +19,22 @@ void TrumaAirconClimate::setup() {
 void TrumaAirconClimate::dump_config() { LOG_CLIMATE(TAG, "Truma Aircon Climate", this); }
 
 void TrumaAirconClimate::control(const climate::ClimateCall &call) {
-  auto status = this->parent_->get_aircon_manual()->get_status();
-  float temp = temp_code_to_decimal(status->target_temp_aircon, 22);
-  AirconMode mode = status->mode;
-  AirconVentMode vent_mode = status->vent_mode;
-
-  if (call.get_target_temperature().has_value()) {
-    temp = *call.get_target_temperature();
-  }
-
+  // Every field goes through its own action. Each one starts from the pending update, so a value
+  // from a previous call is kept until the CP Plus has confirmed it.
+  auto aircon = this->parent_->get_aircon_manual();
+  bool switched_off = false;
   if (call.get_mode().has_value()) {
-    climate::ClimateMode climate_mode = *call.get_mode();
-    mode = this->climate_mode_to_aircon_mode_(climate_mode);
+    AirconMode mode = this->climate_mode_to_aircon_mode_(*call.get_mode());
+    aircon->action_set_mode(mode);
+    switched_off = mode == AirconMode::AIRCON_MODE_OFF;
   }
-
-  if (call.get_fan_mode().has_value()) {
-    climate::ClimateFanMode fan_mode = *call.get_fan_mode();
-    vent_mode = this->fan_mode_to_vent_mode_(fan_mode);
+  // A vent mode would switch the aircon back on.
+  if (call.get_fan_mode().has_value() && !switched_off) {
+    aircon->action_set_vent_mode(this->fan_mode_to_vent_mode_(*call.get_fan_mode()));
   }
-
-  this->parent_->get_aircon_manual()->action_aircon_manual(static_cast<uint8_t>(temp), mode, vent_mode);
+  if (call.get_target_temperature().has_value()) {
+    aircon->action_set_temp(static_cast<uint8_t>(*call.get_target_temperature()));
+  }
 }
 
 climate::ClimateTraits TrumaAirconClimate::traits() {

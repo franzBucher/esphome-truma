@@ -21,6 +21,11 @@ class TrumaiNetBoxAppHeater : public TrumaStausFrameResponseStorage<StatusFrameH
   // Main loop: the last status reports a heater error (HEATER_HAS_ERROR, "manual reset required").
   bool has_error() const;
 
+  // Main loop: the target the CP Plus will see next — the pending update while one is prepared or
+  // not yet confirmed by a status frame, otherwise the last status.
+  TargetTemp pending_target_temp_room() const;
+  TargetTemp pending_target_temp_water() const;
+
   bool action_heater_room(uint8_t temperature, HeatingMode mode = HeatingMode::HEATING_MODE_OFF);
   bool action_heater_water(uint8_t temperature);
   bool action_heater_water(TargetTemp temperature);

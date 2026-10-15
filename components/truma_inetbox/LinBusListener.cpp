@@ -66,8 +66,9 @@ void LinBusListener::setup() {
 #endif  // ESPHOME_LOG_LEVEL > ESPHOME_LOG_LEVEL_NONE
 
   if (this->cs_pin_ != nullptr) {
-    // Enable LIN driver if not in oberserver mode.
-    this->cs_pin_->digital_write(!this->observer_mode_);
+    // Keep the transceiver awake in observer mode too: sending is blocked in software
+    // (write_lin_answer_), a sleeping transceiver would also stop receiving.
+    this->cs_pin_->digital_write(true);
   }
 }
 

@@ -150,11 +150,6 @@ void IDFUARTComponent::dump_config() {
 
 void IDFUARTComponent::write_array(const uint8_t *data, size_t len) {
   uart_write_bytes(this->uart_num_, data, len);
-#ifdef USE_UART_DEBUGGER
-  for (size_t i = 0; i < len; i++) {
-    this->debug_callback_.call(UART_DIRECTION_TX, data[i]);
-  }
-#endif
 }
 
 bool IDFUARTComponent::peek_byte(uint8_t *data) {
@@ -186,11 +181,6 @@ bool IDFUARTComponent::read_array(uint8_t *data, size_t len) {
   }
   if (length_to_read > 0)
     uart_read_bytes(this->uart_num_, data, length_to_read, pdMS_TO_TICKS(20));
-#ifdef USE_UART_DEBUGGER
-  for (size_t i = 0; i < len; i++) {
-    this->debug_callback_.call(UART_DIRECTION_RX, data[i]);
-  }
-#endif
   return true;
 }
 

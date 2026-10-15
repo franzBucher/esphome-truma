@@ -13,22 +13,22 @@ void TrumaHeaterSelect::setup() {
       case TRUMA_SELECT_TYPE::HEATER_FAN_MODE:
         switch (status->heating_mode) {
           case HeatingMode::HEATING_MODE_ECO:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::ECO).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::ECO);
             break;
           case HeatingMode::HEATING_MODE_VARIO_HEAT_NIGHT:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::VARIO_HEAT_NIGHT).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::VARIO_HEAT_NIGHT);
             break;
           case HeatingMode::HEATING_MODE_HIGH:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::COMBI_HIGH).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::COMBI_HIGH);
             break;
           case HeatingMode::HEATING_MODE_VARIO_HEAT_AUTO:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::VARIO_HEAT_AUTO).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::VARIO_HEAT_AUTO);
             break;
           case HeatingMode::HEATING_MODE_BOOST:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::BOOST).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::BOOST);
             break;
           default:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::OFF).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_FAN_MODE::OFF);
             break;
         }
         break;
@@ -36,7 +36,7 @@ void TrumaHeaterSelect::setup() {
       case TRUMA_SELECT_TYPE::HEATER_ENERGY_MIX:
         switch (status->energy_mix_a) {
           case EnergyMix::ENERGY_MIX_GAS:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS);
             break;
           case EnergyMix::ENERGY_MIX_MIX:
             switch (status->el_power_level_a) {
@@ -47,7 +47,7 @@ void TrumaHeaterSelect::setup() {
                 this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::MIX_2).value());
                 break;
               default:
-                this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS).value());
+                this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS);
                 break;
             }
             break;
@@ -60,12 +60,12 @@ void TrumaHeaterSelect::setup() {
                 this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::ELECTRIC_2).value());
                 break;
               default:
-                this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS).value());
+                this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS);
                 break;
             }
             break;
           default:
-            this->publish_state(this->at((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS).value());
+            this->publish_state((size_t) TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX::GAS);
             break;
         }
         break;
@@ -81,8 +81,8 @@ void TrumaHeaterSelect::control(const std::string &value) {
   if (!index.has_value()) {
     return;
   }
-  auto status_heater = this->parent_->get_heater()->get_status();
-  float temp = temp_code_to_decimal(status_heater->target_temp_room, 0);
+  // Start from the pending target, so a temperature sent just before is not overwritten.
+  float temp = temp_code_to_decimal(this->parent_->get_heater()->pending_target_temp_room(), 0);
   if (index.value() > 0 && temp < 5) {
     temp = 5;
   }

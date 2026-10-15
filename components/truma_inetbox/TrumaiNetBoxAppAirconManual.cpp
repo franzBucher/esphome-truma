@@ -140,30 +140,6 @@ bool TrumaiNetBoxAppAirconManual::action_set_vent_mode(AirconVentMode vent_mode)
   return true;
 }
 
-bool TrumaiNetBoxAppAirconManual::action_aircon_manual(uint8_t temperature, AirconMode mode,
-                                                        AirconVentMode vent_mode) {
-  if (!this->can_update()) {
-    ESP_LOGW(TAG, "Cannot update Truma aircon.");
-    return false;
-  }
-
-  auto update_data = this->update_prepare();
-  update_data->mode = mode;
-  update_data->vent_mode = vent_mode;
-  update_data->target_temp_aircon = decimal_to_aircon_manual_temp(temperature);
-
-  if (mode == AirconMode::AIRCON_MODE_OFF) {
-    update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
-  } else if (mode == AirconMode::AIRCON_MODE_AUTO) {
-    update_data->vent_mode = AirconVentMode::AIRCON_VENT_AUTO;
-  } else if (update_data->vent_mode == AirconVentMode::AIRCON_VENT_AUTO) {
-    update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
-  }
-
-  this->update_submit();
-  return true;
-}
-
 // The light position is not confirmed on hardware yet.
 bool TrumaiNetBoxAppAirconManual::action_set_light(uint8_t level) {
   if (!this->can_update()) {

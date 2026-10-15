@@ -78,7 +78,7 @@ CONF_SUPPORTED_TYPE = {
         CONF_MIN_VALUE: 15,
         CONF_STEP: 1,
     },
-    # Aventa light level, 0 = off. Not confirmed on hardware yet.
+    # Aventa light level, 0 = off. Confirmed on an Aventa (issue #28).
     "AIRCON_LIGHT": {
         CONF_CLASS: truma_inetbox_ns.class_("TrumaAirconManualNumber", number.Number, cg.Component),
         CONF_TYPE: TRUMA_NUMBER_TYPE_dummy_ns.AIRCON_LIGHT,

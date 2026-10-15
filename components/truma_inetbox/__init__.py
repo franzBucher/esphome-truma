@@ -441,8 +441,8 @@ async def truma_inetbox_timer_disable_to_code(config, action_id, template_arg, a
     automation.maybe_simple_id(
         {
             cv.GenerateID(): cv.use_id(TrumaINetBoxApp),
-            cv.Required(CONF_START): cv.templatable(cv.int_range(min=0, max=1440)),
-            cv.Required(CONF_STOP): cv.templatable(cv.int_range(min=0, max=1440)),
+            cv.Required(CONF_START): cv.templatable(cv.int_range(min=0, max=1439)),
+            cv.Required(CONF_STOP): cv.templatable(cv.int_range(min=0, max=1439)),
             cv.Required(CONF_ROOM_TEMPERATURE): cv.templatable(cv.int_range(min=0, max=30)),
             cv.Optional(CONF_HEATING_MODE, "OFF"): cv.templatable(cv.enum(CONF_SUPPORTED_HEATING_MODE, upper=True)),
             cv.Optional(CONF_WATER_TEMPERATURE, 0): cv.templatable(cv.int_range(min=0, max=80)),

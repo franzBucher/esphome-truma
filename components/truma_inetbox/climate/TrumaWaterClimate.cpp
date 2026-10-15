@@ -29,11 +29,10 @@ void TrumaWaterClimate::control(const climate::ClimateCall &call) {
 
   if (call.get_mode().has_value()) {
     climate::ClimateMode mode = *call.get_mode();
-    auto status_heater = this->parent_->get_heater()->get_status();
     switch (mode) {
       case climate::CLIMATE_MODE_HEAT:
-        // A target in the same call wins over the switch-on default.
-        if (status_heater->target_temp_water == TargetTemp::TARGET_TEMP_OFF &&
+        // A target in the same call or a pending one from a previous call wins over the switch-on default.
+        if (this->parent_->get_heater()->pending_target_temp_water() == TargetTemp::TARGET_TEMP_OFF &&
             !call.get_target_temperature().has_value()) {
           this->parent_->get_heater()->action_heater_water(WATER_SWITCH_ON_TEMPERATURE);
         }

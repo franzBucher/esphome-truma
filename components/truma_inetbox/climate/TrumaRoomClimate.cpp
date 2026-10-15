@@ -17,9 +17,11 @@ void TrumaRoomClimate::setup() {
 
     switch (status_heater->heating_mode) {
       case HeatingMode::HEATING_MODE_ECO:
+      case HeatingMode::HEATING_MODE_VARIO_HEAT_NIGHT:
         this->fan_mode = climate::CLIMATE_FAN_LOW;
         break;
       case HeatingMode::HEATING_MODE_HIGH:
+      case HeatingMode::HEATING_MODE_VARIO_HEAT_AUTO:
         this->fan_mode = climate::CLIMATE_FAN_MEDIUM;
         break;
       case HeatingMode::HEATING_MODE_BOOST:
@@ -36,33 +38,32 @@ void TrumaRoomClimate::setup() {
 void TrumaRoomClimate::dump_config() { LOG_CLIMATE(TAG, "Truma Room Climate", this); }
 
 void TrumaRoomClimate::control(const climate::ClimateCall &call) {
+  auto heater = this->parent_->get_heater();
   if (call.get_target_temperature().has_value() && !call.get_fan_mode().has_value()) {
     float temp = *call.get_target_temperature();
-    this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp));
+    heater->action_heater_room(static_cast<uint8_t>(temp));
   }
 
   if (call.get_mode().has_value()) {
     // User requested mode change
     climate::ClimateMode mode = *call.get_mode();
-    auto status_heater = this->parent_->get_heater()->get_status();
     switch (mode) {
       case climate::CLIMATE_MODE_HEAT:
-        // A target in the same call wins over the switch-on default.
-        if (status_heater->target_temp_room == TargetTemp::TARGET_TEMP_OFF &&
+        // A target in the same call or a pending one from a previous call wins over the switch-on default.
+        if (heater->pending_target_temp_room() == TargetTemp::TARGET_TEMP_OFF &&
             !call.get_target_temperature().has_value()) {
-          this->parent_->get_heater()->action_heater_room(ROOM_SWITCH_ON_TEMPERATURE);
+          heater->action_heater_room(ROOM_SWITCH_ON_TEMPERATURE);
         }
         break;
       default:
-        this->parent_->get_heater()->action_heater_room(0);
+        heater->action_heater_room(0);
         break;
     }
   }
 
   if (call.get_fan_mode().has_value()) {
     auto fan_mode = *call.get_fan_mode();
-    auto status_heater = this->parent_->get_heater()->get_status();
-    float temp = temp_code_to_decimal(status_heater->target_temp_room, 0);
+    float temp = temp_code_to_decimal(heater->pending_target_temp_room(), 0);
     if (call.get_target_temperature().has_value()) {
       temp = *call.get_target_temperature();
     }
@@ -70,25 +71,26 @@ void TrumaRoomClimate::control(const climate::ClimateCall &call) {
       case climate::CLIMATE_FAN_LOW:
       case climate::CLIMATE_FAN_MEDIUM:
       case climate::CLIMATE_FAN_HIGH:
-        if (temp < 5) {
-          temp = 5;
+        if (temp < ROOM_SWITCH_ON_TEMPERATURE) {
+          temp = ROOM_SWITCH_ON_TEMPERATURE;
         }
         break;
       default:
         break;
     }
+    // LOW/MEDIUM are Eco/High on a Combi and Night/Auto on a Vario Heat, like the fan mode select.
     switch (fan_mode) {
       case climate::CLIMATE_FAN_LOW:
-        this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_ECO);
+        heater->action_heater_room(static_cast<uint8_t>(temp), heater->fan_mode_heating_mode(false));
         break;
       case climate::CLIMATE_FAN_MEDIUM:
-        this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_HIGH);
+        heater->action_heater_room(static_cast<uint8_t>(temp), heater->fan_mode_heating_mode(true));
         break;
       case climate::CLIMATE_FAN_HIGH:
-        this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_BOOST);
+        heater->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_BOOST);
         break;
       default:
-        this->parent_->get_heater()->action_heater_room(0);
+        heater->action_heater_room(0);
         break;
     }
   }

@@ -6,12 +6,14 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.aircon_manual_number";
+// Shown while the aircon is off: the number's minimum, values below 16 °C mean off.
+static constexpr float AIRCON_TEMPERATURE_OFF = 15;
 
 void TrumaAirconManualNumber::setup() {
   this->parent_->get_aircon_manual()->add_on_message_callback([this](const StatusFrameAirconManual *status) {
     switch (this->type_) {
       case TRUMA_NUMBER_TYPE::AIRCON_MANUAL_TEMPERATURE:
-        this->publish_state(temp_code_to_decimal(status->target_temp_aircon, 0));
+        this->publish_state(temp_code_to_decimal(status->target_temp_aircon, AIRCON_TEMPERATURE_OFF));
         break;
       case TRUMA_NUMBER_TYPE::AIRCON_LIGHT:
         this->publish_state(static_cast<float>(status->light / AIRCON_LIGHT_STEP));

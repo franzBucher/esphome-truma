@@ -84,7 +84,7 @@ bool TrumaiNetBoxAppTimer::action_timer_activate(uint16_t start, uint16_t stop, 
     ESP_LOGW(TAG, "Cannot update Truma.");
     return false;
   }
-  if (start > MINUTES_PER_DAY || stop > MINUTES_PER_DAY) {
+  if (start >= MINUTES_PER_DAY || stop >= MINUTES_PER_DAY) {
     ESP_LOGW(TAG, "Invalid values start/stop submitted.");
     return false;
   }
@@ -146,6 +146,16 @@ bool TrumaiNetBoxAppTimer::action_timer_activate(uint16_t start, uint16_t stop, 
     if (timer->timer_el_power_level_a == ElectricPowerLevel::ELECTRIC_POWER_LEVEL_0) {
       timer->timer_el_power_level_a = ElectricPowerLevel::ELECTRIC_POWER_LEVEL_900;
     }
+  }
+
+  // Same guard as the heater: energy mix and power level must not contradict each other.
+  if (timer->timer_el_power_level_a != ElectricPowerLevel::ELECTRIC_POWER_LEVEL_0) {
+    if (timer->timer_energy_mix_a != EnergyMix::ENERGY_MIX_MIX &&
+        timer->timer_energy_mix_a != EnergyMix::ENERGY_MIX_ELECTRICITY) {
+      timer->timer_energy_mix_a = EnergyMix::ENERGY_MIX_MIX;
+    }
+  } else {
+    timer->timer_energy_mix_a = EnergyMix::ENERGY_MIX_GAS;
   }
 
   this->update_submit();
