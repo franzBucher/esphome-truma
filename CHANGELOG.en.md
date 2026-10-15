@@ -23,6 +23,16 @@ Tested against:
 ---
 
 
+## [1.0.45] — 2026-10-15 — Cleanup
+
+### Changed
+- `truma_inetbox`: The spellings `1.8kW`, `1,8 kW` for `watt` are accepted now.
+- `truma_inetbox`: `CP_PLUS_CONNECTED` stays off after the CP Plus disappears until requests arrive
+  again. Before, the sensor briefly showed "connected" about every 71 minutes.
+- `truma_inetbox`: No second warning when the CP Plus fetches an update but none is pending.
+- Code cleanup: named constants instead of numbers, the AUTO send path unused since 1.0.41 and other
+  dead parts removed, comments corrected. No change in behaviour.
+
 ## [1.0.44] — 2026-10-15 — Follow-up commands, robustness
 
 ### Fixed

@@ -23,6 +23,16 @@ Getestet mit:
 ---
 
 
+## [1.0.45] — 2026-10-15 — Aufräumen
+
+### Geändert
+- `truma_inetbox`: Die Schreibweisen `1.8kW`, `1,8 kW` für `watt` werden jetzt angenommen.
+- `truma_inetbox`: `CP_PLUS_CONNECTED` bleibt nach einem Ausfall des CP Plus aus, bis wieder Anfragen
+  kommen. Vorher sprang der Sensor etwa alle 71 Minuten kurz auf „verbunden“.
+- `truma_inetbox`: Keine zweite Warnung mehr, wenn das CP Plus ein Update abholt, aber keins ansteht.
+- Code aufgeräumt: benannte Konstanten statt Zahlen, der seit 1.0.41 ungenutzte Sendepfad der
+  Klimaautomatik und andere tote Teile entfernt, Kommentare berichtigt. Kein Einfluss auf das Verhalten.
+
 ## [1.0.44] — 2026-10-15 — Folgebefehle, Robustheit
 
 ### Behoben
