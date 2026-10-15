@@ -248,7 +248,7 @@ Requires ESPHome >= 2026.9.1.
 
 > **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether other models — in particular newer diesel generations with a burner developed by Truma themselves (without Eberspächer) — are also compatible has not been verified. Feedback on this is very welcome — please open an [issue](https://github.com/havanti/esphome-truma/issues).
 
-> **CP Plus:** Tested on the bench with a CP Plus 4.04.01. Since 1.0.42 the older CP Plus C3 works as well, tested by Marco on a C3.00.00 with Combi 6 Gas (issue #29). On a C3 the component does not set the clock, the C3 does not accept it.
+> **CP Plus:** Tested on the bench with a CP Plus 4.04.01. Since 1.0.42 the older CP Plus C3 works as well, tested by Marco on a C3.00.00 with Combi 6 Gas (issue #29), including the fan mode select Eco/High. On a C3 the component does not set the clock, the C3 does not accept it.
 
 ### Hardware Setup
 

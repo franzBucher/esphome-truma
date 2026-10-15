@@ -12,9 +12,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). `HEATER_HAS_ERROR` meldet jetzt
-auch Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige
-und Licht der Aventa sind bestätigt (Issue #28).
+Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die Lüfterauswahl an der
+Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch Warnungen. Der
+Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und Licht der Aventa
+sind bestätigt (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
@@ -41,7 +42,7 @@ Getestet mit:
 - `truma_inetbox`: `HEATER_HAS_ERROR` geht auch bei Warnungen an, z. B. W255 (kurz beim Start des
   CP Plus).
 - `truma_inetbox`: Die Lüfterauswahl sendet an einer Combi 6 Gas Eco/High statt der Vario-Heat-Stufen.
-  Noch nicht bestätigt.
+  Von Marco bestätigt (PR #30).
 
 ### Dokumentation
 - README: CP Plus C3, `HEATER_HAS_ERROR` und Dank an Marco.

@@ -12,9 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). `HEATER_HAS_ERROR` now also
-reports warnings. The shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display
-and light of the Aventa are confirmed (issue #28).
+Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco also confirmed the fan
+mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings. The shore power sensor
+of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the Aventa are confirmed
+(issue #28).
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
@@ -41,7 +42,7 @@ Tested against:
 - `truma_inetbox`: `HEATER_HAS_ERROR` also turns on for warnings, e.g. W255 (briefly when the CP Plus
   starts).
 - `truma_inetbox`: The fan mode select sends Eco/High to a Combi 6 Gas instead of the Vario Heat modes.
-  Not confirmed yet.
+  Confirmed by Marco (PR #30).
 
 ### Documentation
 - README: CP Plus C3, `HEATER_HAS_ERROR` and thanks to Marco.
