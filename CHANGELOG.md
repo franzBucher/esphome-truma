@@ -23,6 +23,31 @@ Getestet mit:
 ---
 
 
+## [1.0.44] — 2026-10-15 — Folgebefehle, Robustheit
+
+### Behoben
+- `truma_inetbox`: Zwei Befehle kurz nacheinander (z. B. Temperatur setzen, dann Einschalten)
+  überschreiben den ersten nicht mehr mit dem Einschalt-Wert. Raum, Wasser und Lüfterauswahl am
+  Prüfaufbau bestätigt, die Aventa geht denselben Weg.
+- `truma_inetbox`: Die Wasser-Number zeigt bei Boost 80 statt 200. Am Prüfaufbau bestätigt.
+
+### Geändert
+- `truma_inetbox`: Die Lüfterstufen im Raum-Klima wirken jetzt auch an einer Vario Heat (Night/Auto).
+  Noch nicht bestätigt.
+- `truma_inetbox`: Eine eigene, kürzere `options:`-Liste bei `select` wird bei der Prüfung der
+  Konfiguration abgelehnt, vorher startete der ESP damit immer wieder neu.
+- `truma_inetbox`: `observer_mode` lässt den LIN-Transceiver über `cs_pin` wach, sonst hört der ESP nichts.
+- `truma_inetbox`: Timer-Zeiten bis 23:59; eine Stromstufe ohne Energiemix wird wie bei der Heizung ergänzt.
+- `truma_inetbox`: Die Aventa-Number zeigt bei Aus 15 statt 0.
+- `truma_inetbox`: Die Zeit-Plattform `time: platform: truma_inetbox` stellt die ESP-Uhr jetzt richtig.
+
+### Entfernt
+- `uart`: Die Option `debug:`, sie störte den LIN-Takt.
+
+### Dokumentation
+- README/Beispiele: Aventa-Beispiel ohne das entfernte AUTO-Setzen, Aktionen mit `DIESEL`/`NIGHT`/`AUTO`,
+  veraltete Angaben (Mindestversion, Sensornamen, Links) bereinigt.
+
 ## [1.0.43] — 2026-10-14 — Heizen mit Temperatur, Uhr-Sync
 
 ### Behoben

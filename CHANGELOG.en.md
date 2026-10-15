@@ -23,6 +23,31 @@ Tested against:
 ---
 
 
+## [1.0.44] — 2026-10-15 — Follow-up commands, robustness
+
+### Fixed
+- `truma_inetbox`: Two commands shortly after each other (e.g. set a temperature, then switch on) no
+  longer overwrite the first one with the switch-on default. Room, water and fan mode select confirmed
+  on the bench, the Aventa takes the same path.
+- `truma_inetbox`: The water number shows 80 instead of 200 on boost. Confirmed on the bench.
+
+### Changed
+- `truma_inetbox`: The fan modes of the room climate now also work on a Vario Heat (Night/Auto).
+  Not confirmed yet.
+- `truma_inetbox`: A custom, shorter `options:` list on a `select` is rejected during config
+  validation, before the ESP kept restarting with it.
+- `truma_inetbox`: `observer_mode` keeps the LIN transceiver awake via `cs_pin`, otherwise the ESP hears nothing.
+- `truma_inetbox`: Timer times up to 23:59; a power level without energy mix is completed as for the heater.
+- `truma_inetbox`: The Aventa number shows 15 instead of 0 when off.
+- `truma_inetbox`: The time platform `time: platform: truma_inetbox` now sets the ESP clock correctly.
+
+### Removed
+- `uart`: The `debug:` option, it disturbed the LIN timing.
+
+### Documentation
+- README/examples: Aventa example without the removed AUTO control, actions with `DIESEL`/`NIGHT`/`AUTO`,
+  outdated details (minimum version, sensor names, links) cleaned up.
+
 ## [1.0.43] — 2026-10-14 — Heating with a target, clock sync
 
 ### Fixed
