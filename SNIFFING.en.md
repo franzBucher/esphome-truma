@@ -8,9 +8,9 @@ Help support more **Truma Cooler models** by capturing the BLE communication bet
 
 ## Why?
 
-The BLE protocol of the `truma_cooler` component was reverse-engineered **only from the C44 model** (single zone). Other models differ:
+The BLE protocol of the `truma_cooler` component was reverse-engineered from the **C44** (single zone) and the **C69** (two zones). Other models differ:
 
-- **Multi-zone models** (e.g. the **C69** with two zones) carry extra fields in the frame — target/actual temperature and compressor state **per zone**.
+- **Other multi-zone models** may carry extra fields in the frame — target/actual temperature and compressor state **per zone**.
 - Other series may use **different service/characteristic UUIDs or GATT handles** — in which case connecting/subscribing already fails.
 
 Without a capture of your model this can't be implemented. With a clean sniff plus your notes the protocol can be reconstructed and the component extended.
@@ -116,11 +116,11 @@ On newer Android versions this file practically never exists anymore → use **M
 
 ## Step 4 — What to send
 
-Open an [issue](../../issues/new/choose) ("Report a Cooler model") and attach / provide:
+Open an [issue](../../issues/new/choose) ("Truma Cooler model report") and attach / provide:
 
 - the **`btsnoop_hci.log`** (or several parts),
 - your **action/time notes** from Step 2,
-- the exact **model** (e.g. "Truma Cooler C69"),
+- the exact **model** (e.g. "Truma Cooler C60"),
 - the **number of zones**,
 - the **Truma app version**,
 - optional: the ESPHome DEBUG logs from Step 0.

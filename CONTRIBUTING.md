@@ -10,4 +10,4 @@ Direktes Feedback und Ideen sind in Issues sehr willkommen.
 
 ## Zweisprachige Dokumentation
 
-README, CHANGELOG und CONTRIBUTING liegen immer in DE + EN vor. Änderungen **immer in beiden Sprachversionen gleichzeitig** einreichen.
+README, CHANGELOG, CONTRIBUTING, TROUBLESHOOTING, SNIFFING und hardware/README liegen immer in DE + EN vor. Änderungen **immer in beiden Sprachversionen gleichzeitig** einreichen.

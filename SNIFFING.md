@@ -8,9 +8,9 @@ Hilf mit, weitere **Truma-Cooler-Modelle** zu unterstützen, indem du einen Mits
 
 ## Warum?
 
-Das BLE-Protokoll der `truma_cooler`-Komponente wurde **ausschließlich am Modell C44** (eine Zone) reverse-engineered. Andere Modelle weichen ab:
+Das BLE-Protokoll der `truma_cooler`-Komponente wurde an den Modellen **C44** (eine Zone) und **C69** (zwei Zonen) reverse-engineered. Andere Modelle weichen ab:
 
-- **Mehrzonen-Modelle** (z. B. **C69** mit zwei Zonen) haben zusätzliche Felder im Telegramm — Soll-/Ist-Temperatur und Kompressor-Status **je Zone**.
+- **Andere Mehrzonen-Modelle** haben evtl. zusätzliche Felder im Telegramm — Soll-/Ist-Temperatur und Kompressor-Status **je Zone**.
 - Andere Baureihen nutzen evtl. **andere Service-/Characteristic-UUIDs oder GATT-Handles** — dann scheitert schon das Verbinden/Abonnieren.
 
 Ohne Mitschnitt deines Modells lässt sich das nicht implementieren. Mit einem sauberen Sniff + deinen Notizen kann das Protokoll rekonstruiert und die Komponente erweitert werden.
@@ -120,7 +120,7 @@ Auf neueren Android-Versionen existiert diese Datei praktisch nie mehr → dann 
 
 - die **`btsnoop_hci.log`** (oder mehrere Teile),
 - deine **Aktions-/Zeit-Notizen** aus Schritt 2,
-- das genaue **Modell** (z. B. „Truma Cooler C69"),
+- das genaue **Modell** (z. B. „Truma Cooler C60"),
 - **Anzahl Zonen**,
 - die **Version der Truma-App**,
 - optional: die ESPHome-DEBUG-Logs aus Schritt 0.

@@ -104,7 +104,7 @@ Beim **ESP32-PICO-D4** sind GPIO16/17 intern mit dem eingebetteten Flash verbund
 
 Ein `sensor:` und ein `number:`/`select:` mit **identischem Namen** erzeugen denselben Hash-Key — `aioesphomeapi` (Home Assistant) stürzt beim Verbinden ab.
 
-**Lösung:** Sensor-Readbacks mit dem Suffix `Status` benennen (z. B. `Target Room Temperature Status`), wie in den Beispiel-YAMLs ab Version 1.0.20.
+**Lösung:** Sensor-Readbacks mit dem Suffix `Status` benennen (z. B. `Target Room Temperature Status`), wie in den Beispiel-YAMLs ab Version 1.0.11.
 
 ---
 

@@ -6,13 +6,13 @@
 <div align="center">
 
 
-# ESPHOME-TRUMA-HEATER AND MORE
+# ESPHOME-TRUMA AND MORE
 
 **Why freeze in campervan when ESP32 fix everything for you?**
 
 [![Release](https://img.shields.io/github/v/release/havanti/esphome-truma?style=flat-square&color=blue)](https://github.com/havanti/esphome-truma/releases) [![Stars](https://img.shields.io/github/stars/havanti/esphome-truma?style=flat-square&color=yellow)](https://github.com/havanti/esphome-truma) [![ESPHome](https://img.shields.io/badge/ESPHome-%E2%89%A52026.9.1-blue?style=flat-square)](https://esphome.io) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
 
-[Features](#what-this-fork-adds) • [Examples](#example-configurations) • [Hardware](hardware/) • [De-coking](#diesel-de-coking--residue-combustion) • [Aventa AC](#truma-aventa-gen-2--air-conditioning) • [Cooler](#truma-cooler-cxx--cooling-box) • [TPMS](#tpms--tire-pressure-monitoring-via-bluetooth-proxy) • [Troubleshooting](TROUBLESHOOTING.en.md) • [Contributing](CONTRIBUTING.en.md)
+[Features](#what-this-fork-adds) • [Examples](#example-configurations) • [Hardware](hardware/README.en.md) • [De-coking](#diesel-de-coking--residue-combustion) • [Aventa AC](#truma-aventa-gen-2--air-conditioning) • [Cooler](#truma-cooler-cxx--cooling-box) • [TPMS](#tpms--tire-pressure-monitoring-via-bluetooth-proxy) • [Troubleshooting](TROUBLESHOOTING.en.md) • [Contributing](CONTRIBUTING.en.md)
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 English
 
@@ -73,7 +73,7 @@ A template sensor (Diesel De-coking Remaining Time, unit: min) counts down the r
 
 ### Truma Aventa Gen 2 — Air Conditioning
 
-<img src="img/Aventa.png" width="300" alt="Truma Aventa Gen 2 air conditioner">
+<img src="img/Aventa.png" width="500" alt="Truma Aventa Gen 2 air conditioner">
 
 The ESP32 controls the Truma Aventa Gen 2 air conditioner over the same LIN bus as the heater — no second device required. A full climate entity with all operating modes appears in Home Assistant. According to user feedback this also works with the first generation Aventa (issue #26, #28).
 
@@ -155,7 +155,7 @@ The ESP32 doubles as a Bluetooth Low Energy (BLE) receiver for aftermarket TPMS 
 - Tire temperature in °C
 - Sensor battery voltage in V
 
-The integration uses `esp32_ble_tracker` with passive scanning and parses the manufacturer-specific advertisement payload directly in a C++ lambda. All twelve sensor entities appear automatically in Home Assistant as diagnostic sensors.
+The integration uses `esp32_ble_tracker` with passive scanning and parses the manufacturer-specific advertisement payload directly in a C++ lambda. All twelve sensor entities appear automatically in Home Assistant.
 
 To adapt this for your own sensors, replace the four MAC addresses in the `on_ble_advertise` blocks with those of your TPMS sensors. The payload decoding logic (pressure offset, scaling) may need adjustment depending on your sensor brand.
 
@@ -199,10 +199,10 @@ System diagnostics — The following sensors are always available in Home Assist
 
 | Sensor | Description |
 |---|---|
-| TR ESP32 Temperature | Internal chip temperature |
-| TR WiFi Signal dB | Raw RSSI in dBm (updated every 60 s) |
-| TR WiFi Signal | RSSI mapped to 0–100 % for easy dashboarding |
-| Uptime Sensor | Time since last boot |
+| ESP32 Internal Temperature | Internal chip temperature |
+| WiFi Signal dB | Raw RSSI in dBm (updated every 60 s) |
+| WiFi Signal | RSSI mapped to 0–100 % for easy dashboarding |
+| Uptime | Time since last boot |
 
 Home Assistant time sync — The ESP clock is kept in sync via the Home Assistant time platform, which is required for the timer actions to work correctly.
 
@@ -252,9 +252,9 @@ Requires ESPHome >= 2026.9.1.
 
 ### Hardware Setup
 
-For wiring the ESP32-S3 with the TJA1020 LIN transceiver and the Truma connector:
+For the complete hardware setup — parts list, wiring diagram, step-by-step guide and troubleshooting:
 
-➜ **[hardware/README.en.md](hardware/README.en.md)** — Parts list, wiring diagram, pin assignment, installation order
+➜ **[hardware/README.en.md](hardware/README.en.md)**
 
 ---
 
@@ -578,7 +578,7 @@ The following [ESP Home actions](https://esphome.io/guides/automations.html#acti
 
 - `truma_inetbox.heater.set_target_room_temperature`
   - `temperature` - Temperature between 5 °C and 30 °C. Below 5 °C will disable the Heater.
-  - `heating_mode` - Optional set heating mode: `"OFF"`, `ECO`, `HIGH`, `BOOST`.
+  - `heating_mode` - Optional set heating mode: `"OFF"`, `ECO`, `HIGH`, `BOOST`, on a Vario Heat `NIGHT`, `AUTO`.
 - `truma_inetbox.heater.set_target_water_temperature`
   - `temperature` - Set water temp as number: `0`, `40`, `60`, `80`.
 - `truma_inetbox.heater.set_target_water_temperature_enum`
@@ -586,7 +586,7 @@ The following [ESP Home actions](https://esphome.io/guides/automations.html#acti
 - `truma_inetbox.heater.set_electric_power_level`
   - `watt` - Set electricity level to `0`, `900`, `1800`.
 - `truma_inetbox.heater.set_energy_mix`
-  - `energy_mix` - Set energy mix to: `GAS`, `MIX`, `ELECTRICITY`.
+  - `energy_mix` - Set energy mix to: `GAS` (or `DIESEL`), `MIX`, `ELECTRICITY`.
   - `watt` - Optional: Set electricity level to `0`, `900`, `1800`
 - `truma_inetbox.aircon.manual.set_target_temperature`
   - `temperature` - Temperature between 16 °C and 31 °C. Below 16 °C will disable the Aircon.
@@ -595,9 +595,9 @@ The following [ESP Home actions](https://esphome.io/guides/automations.html#acti
   - `start` - Start time.
   - `stop` - Stop time.
   - `room_temperature` - Temperature between 5 °C and 30 °C.
-  - `heating_mode` - Optional: Set heating mode: `"OFF"`, `ECO`, `HIGH`, `BOOST`.
+  - `heating_mode` - Optional: Set heating mode: `"OFF"`, `ECO`, `HIGH`, `BOOST`, on a Vario Heat `NIGHT`, `AUTO`.
   - `water_temperature` - Optional: Set water temp as number: `0`, `40`, `60`, `80`.
-  - `energy_mix` - Optional: Set energy mix to: `GAS`, `MIX`, `ELECTRICITY`.
+  - `energy_mix` - Optional: Set energy mix to: `GAS` (or `DIESEL`), `MIX`, `ELECTRICITY`.
   - `watt` - Optional: Set electricity level to `0`, `900`, `1800`.
 - `truma_inetbox.clock.set` - Update CP Plus from ESP Home. You *must* have another [clock source](https://esphome.io/#time-components) configured like Home Assistant Time, GPS or DS1307 RTC.
 
@@ -621,7 +621,7 @@ interval:
       - truma_inetbox.clock.set:
 ```
 
-GPS or a DS1307 RTC also work as a clock source instead of Home Assistant Time. The example configurations already include this setup.
+GPS or a DS1307 RTC also work as a clock source instead of Home Assistant Time. The example configurations already include the call via `on_time_sync`.
 
 ## Feedback & Testing
 

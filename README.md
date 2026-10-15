@@ -22,7 +22,7 @@
 
 1. **Hardware** → [Verdrahtung & Teileliste](hardware/README.md)
 2. **Variante wählen** → passende YAML aus der [Tabelle unten](#beispielkonfigurationen) (Gas/Diesel × ESP32/ESP32-S3)
-3. **`secrets.yaml` anlegen** → [Vorlage](#voraussetzungen)
+3. **`secrets.yaml` anlegen** → [Vorlage](#voraussetzungen-1)
 4. **Flashen** → `esphome run <config>.yaml`
 
 Minimalbeispiel für den schnellen Einstieg → [direkt hier](#minimalbeispiel)
@@ -153,7 +153,7 @@ Der ESP32 fungiert gleichzeitig als Bluetooth Low Energy (BLE)-Empfänger für h
 - Reifentemperatur in °C
 - Sensorakku-Spannung in V
 
-Die Integration nutzt `esp32_ble_tracker` mit passivem Scanning und wertet die herstellerspezifischen BLE-Advertisement-Nutzdaten direkt in einem C++-Lambda aus. Alle zwölf Sensor-Entitäten erscheinen automatisch in Home Assistant als Diagnose-Sensoren.
+Die Integration nutzt `esp32_ble_tracker` mit passivem Scanning und wertet die herstellerspezifischen BLE-Advertisement-Nutzdaten direkt in einem C++-Lambda aus. Alle zwölf Sensor-Entitäten erscheinen automatisch in Home Assistant.
 
 Um dies für eigene Sensoren anzupassen, sind die vier MAC-Adressen in den `on_ble_advertise`-Blöcken durch die eigenen TPMS-Sensor-Adressen zu ersetzen. Die Dekodierungslogik (Druckoffset, Skalierung) muss je nach Sensormarke gegebenenfalls angepasst werden.
 
@@ -197,10 +197,10 @@ Systemdiagnose — Folgende Sensoren sind in Home Assistant immer verfügbar:
 
 | Sensor | Beschreibung |
 |---|---|
-| TR ESP32 Temperature | Interne Chip-Temperatur |
-| TR WiFi Signal dB | Roh-RSSI in dBm (alle 60 s aktualisiert) |
-| TR WiFi Signal | RSSI auf 0–100 % abgebildet für einfaches Dashboarding |
-| Uptime Sensor | Zeit seit dem letzten Neustart |
+| ESP32 Internal Temperature | Interne Chip-Temperatur |
+| WiFi Signal dB | Roh-RSSI in dBm (alle 60 s aktualisiert) |
+| WiFi Signal | RSSI auf 0–100 % abgebildet für einfaches Dashboarding |
+| Uptime | Zeit seit dem letzten Neustart |
 
 Home-Assistant-Zeitsynchronisation — Die ESP-Uhr wird über die Home-Assistant-Zeitplattform synchron gehalten, was für das korrekte Funktionieren der Timer-Aktionen erforderlich ist.
 
@@ -291,7 +291,7 @@ Die Variante bestimmt, welche ESPHome-Entitäten aktiviert werden:
 | Log-Level | `DEBUG` | `DEBUG` |
 
 ESP32-Variante verwenden, wenn ein Standard-ESP32 (WROOM-32, DevKit usw.) ohne PSRAM vorhanden ist.
-Das Auskommentieren von `CONFIG_ESP32_REV_MIN: "3"` und `version: recommended` kann die Binärgröße bei älteren Toolchains reduzieren.
+Das Einkommentieren von `CONFIG_ESP32_REV_MIN: "3"` und `version: recommended` kann die Binärgröße bei älteren Toolchains reduzieren.
 
 ESP32-S3-Variante verwenden, wenn ein ESP32-S3-Modul mit OctalSPI-PSRAM (z.B. N16R8) vorhanden ist.
 Die PSRAM-Konfiguration (OCT-Modus, 80 MHz) ist für diese Modulvariante erforderlich.
@@ -579,7 +579,7 @@ Folgende [ESPHome-Aktionen](https://esphome.io/guides/automations.html#actions) 
 
 - `truma_inetbox.heater.set_target_room_temperature`
   - `temperature` - Temperatur zwischen 5 °C und 30 °C. Unter 5 °C wird das Heizgerät deaktiviert.
-  - `heating_mode` - Optional: Heizmodus setzen: `"OFF"`, `ECO`, `HIGH`, `BOOST`.
+  - `heating_mode` - Optional: Heizmodus setzen: `"OFF"`, `ECO`, `HIGH`, `BOOST`, an einer Vario Heat `NIGHT`, `AUTO`.
 - `truma_inetbox.heater.set_target_water_temperature`
   - `temperature` - Wassertemperatur als Zahl: `0`, `40`, `60`, `80`.
 - `truma_inetbox.heater.set_target_water_temperature_enum`
@@ -587,7 +587,7 @@ Folgende [ESPHome-Aktionen](https://esphome.io/guides/automations.html#actions) 
 - `truma_inetbox.heater.set_electric_power_level`
   - `watt` - Stromstufe setzen: `0`, `900`, `1800`.
 - `truma_inetbox.heater.set_energy_mix`
-  - `energy_mix` - Energiemix setzen: `GAS`, `MIX`, `ELECTRICITY`.
+  - `energy_mix` - Energiemix setzen: `GAS` (bzw. `DIESEL`), `MIX`, `ELECTRICITY`.
   - `watt` - Optional: Stromstufe setzen: `0`, `900`, `1800`.
 - `truma_inetbox.aircon.manual.set_target_temperature`
   - `temperature` - Temperatur zwischen 16 °C und 31 °C. Unter 16 °C wird die Klimaanlage deaktiviert.
@@ -596,9 +596,9 @@ Folgende [ESPHome-Aktionen](https://esphome.io/guides/automations.html#actions) 
   - `start` - Startzeit.
   - `stop` - Stoppzeit.
   - `room_temperature` - Temperatur zwischen 5 °C und 30 °C.
-  - `heating_mode` - Optional: Heizmodus: `"OFF"`, `ECO`, `HIGH`, `BOOST`.
+  - `heating_mode` - Optional: Heizmodus: `"OFF"`, `ECO`, `HIGH`, `BOOST`, an einer Vario Heat `NIGHT`, `AUTO`.
   - `water_temperature` - Optional: Wassertemperatur als Zahl: `0`, `40`, `60`, `80`.
-  - `energy_mix` - Optional: Energiemix: `GAS`, `MIX`, `ELECTRICITY`.
+  - `energy_mix` - Optional: Energiemix: `GAS` (bzw. `DIESEL`), `MIX`, `ELECTRICITY`.
   - `watt` - Optional: Stromstufe: `0`, `900`, `1800`.
 - `truma_inetbox.clock.set` - CP Plus vom ESP aus aktualisieren. Es muss eine weitere [Zeitquelle](https://esphome.io/#time-components) konfiguriert sein, z.B. Home Assistant Time, GPS oder DS1307 RTC.
 
@@ -622,7 +622,7 @@ interval:
       - truma_inetbox.clock.set:
 ```
 
-Statt Home Assistant Time funktioniert auch GPS oder eine DS1307-RTC als Zeitquelle. Die Beispiel-Konfigurationen enthalten diese Einrichtung bereits.
+Statt Home Assistant Time funktioniert auch GPS oder eine DS1307-RTC als Zeitquelle. Die Beispiel-Konfigurationen enthalten den Aufruf per `on_time_sync` bereits.
 
 ## Feedback & Tests
 

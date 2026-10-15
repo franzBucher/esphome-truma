@@ -9,8 +9,8 @@ body:
         Thanks for helping support more Truma Cooler models! 🙏
         Danke fürs Mithelfen, weitere Truma-Cooler-Modelle zu unterstützen!
 
-        **Please read the [Sniffing Guide](../../blob/main/SNIFFING.md) first.**
-        **Bitte zuerst die [Sniffing-Anleitung](../../blob/main/SNIFFING.md) lesen.**
+        **Please read the [Sniffing Guide](https://github.com/havanti/esphome-truma/blob/main/SNIFFING.en.md) first.**
+        **Bitte zuerst die [Sniffing-Anleitung](https://github.com/havanti/esphome-truma/blob/main/SNIFFING.md) lesen.**
 
         File attachments (e.g. `btsnoop_hci.log`) can be **dragged into any text box below** — GitHub uploads them.
         Datei-Anhänge (z. B. `btsnoop_hci.log`) lassen sich **in ein Textfeld unten ziehen** — GitHub lädt sie hoch.
@@ -20,7 +20,7 @@ body:
     attributes:
       label: "Cooler model / Kühlbox-Modell"
       description: "Exact model name as printed on the device / Genaue Modellbezeichnung laut Typenschild"
-      placeholder: "e.g. Truma Cooler C69"
+      placeholder: "e.g. Truma Cooler C60"
     validations:
       required: true
 
@@ -95,7 +95,7 @@ body:
     attributes:
       label: "Confirmation / Bestätigung"
       options:
-        - label: "I read the [Sniffing Guide](../../blob/main/SNIFFING.md) / Ich habe die [Sniffing-Anleitung](../../blob/main/SNIFFING.md) gelesen"
+        - label: "I read the [Sniffing Guide](https://github.com/havanti/esphome-truma/blob/main/SNIFFING.en.md) / Ich habe die [Sniffing-Anleitung](https://github.com/havanti/esphome-truma/blob/main/SNIFFING.md) gelesen"
           required: true
-        - label: "The btsnoop log contains only BLE traffic, no personal data / Das btsnoop-Log enthält nur BLE-Verkehr, keine persönlichen Daten"
+        - label: "I am aware the btsnoop log contains all BLE traffic of my phone (MAC addresses, device names) / Mir ist bewusst, dass das btsnoop-Log den gesamten BLE-Verkehr meines Handys enthält (MAC-Adressen, Gerätenamen)"
           required: true

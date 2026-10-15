@@ -10,4 +10,4 @@ Feedback and ideas in issues are very welcome.
 
 ## Bilingual documentation
 
-README, CHANGELOG and CONTRIBUTING always exist in DE + EN. Changes must be submitted in **both language versions simultaneously**.
+README, CHANGELOG, CONTRIBUTING, TROUBLESHOOTING, SNIFFING and hardware/README always exist in DE + EN. Changes must be submitted in **both language versions simultaneously**.

@@ -14,8 +14,9 @@
 #   climate  – Truma Aircon         (modes: Off / Cool / Heat / Heat+Cool / Fan only)
 #   select   – Truma Aircon Mode    (Off / Ventilation / Cooling / Heating / Auto)
 #   select   – Truma Aircon Vent    (Low / Mid / High / Night / Auto)
-#   number   – Truma Aircon Temp    (15–31 °C)
-#   climate/number – Truma Aircon Auto (AUTO on the CP Plus, experimental, commented out below)
+#   number   – Truma Aircon Temp    (16–31 °C)
+#   number   – Truma Aircon Light   (0–5)
+#   sensor / binary_sensor – AUTO on the CP Plus (target, active), read-only
 
 esphome:
   name: "truma"
@@ -84,6 +85,7 @@ time:
 truma_inetbox:
   id: truma_inetbox_id
   uart_id: lin_uart_bus
+  lin_checksum: VERSION_2
   time_id: homeassistant_time   # time source for truma_inetbox.clock.set
   cs_pin: GPIO4    # LIN-Bus CS/Sleep pin — adjust to your wiring
 
